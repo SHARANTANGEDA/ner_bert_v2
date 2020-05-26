@@ -4,3 +4,6 @@
 ./mid_out_all_ner
 ./multi_cased_L-12_H-768_A-12
 ./env
+./labelled_ner.txt
+./train.txt
+./test.txt

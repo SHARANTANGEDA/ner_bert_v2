@@ -1,9 +1,1 @@
-./final_out_1_ner
-./final_out_all_ner
-./mid_out_1_ner
-./mid_out_all_ner
-./multi_cased_L-12_H-768_A-12
-./env
-./labelled_ner.txt
-./train.txt
-./test.txt
+envs/local.env

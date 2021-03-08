@@ -39,7 +39,7 @@ def train_test(epochs, train_batch_size, eval_batch_size, warmup_proportion=0.1,
         val_data, c.LABELS, c.MAX_SEQ_LENGTH, tokenizer, c.TENSOR_VAL_FEATURES_RECORD_FILE, c.LABEL_ID_PKL_FILE)
     _, batch_test_labels, batch_test_inputs = extract_features.convert_data_into_features(
         test_data, c.LABELS, c.MAX_SEQ_LENGTH, tokenizer, c.TENSOR_TEST_FEATURES_RECORD_FILE, c.LABEL_ID_PKL_FILE)
-       
+    
     # Initialize BERT Model
     bert_config = bert.configs.BertConfig.from_json_file(c.BERT_CONFIG_JSON_FILE)
     bert_classifier, bert_encoder = bert.bert_models.classifier_model(bert_config, num_labels=len(c.LABELS),
@@ -59,16 +59,15 @@ def train_test(epochs, train_batch_size, eval_batch_size, warmup_proportion=0.1,
     optimizer = nlp.optimization.create_optimizer(init_lr, num_train_steps=num_train_steps,
                                                   num_warmup_steps=warmup_steps, optimizer_type='adamw')
     
-    
     # Train the model
     metrics = [keras.metrics.SparseCategoricalAccuracy('accuracy', dtype=tf.float32), recall_m, precision_m, f1_m]
     loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
-
+    
     bert_classifier.compile(
         optimizer=optimizer,
         loss=loss,
         metrics=metrics)
-
+    
     bert_classifier.fit(
         batch_train_inputs, batch_train_labels,
         validation_data=(batch_val_inputs, batch_val_labels),
@@ -90,6 +89,7 @@ def train_test(epochs, train_batch_size, eval_batch_size, warmup_proportion=0.1,
     logging.info(f'Test Recall: {test_recall}')
     logging.info(f'Test Precision: {test_precision}')
     logging.info(f'Test F1_Score: {test_f_score}')
+    return save_dir_path
 
 
 def serve_with_saved_model(formatted_data, saved_classifier):
@@ -98,5 +98,3 @@ def serve_with_saved_model(formatted_data, saved_classifier):
     label2id_map = pickle.load(open(c.LABEL_ID_PKL_FILE, "r"))
     id2label_map = {v: k for k, v in label2id_map.items()}
     return np.vectorize(id2label_map.get)[formatted_result]
-    
-

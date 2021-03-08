@@ -7,6 +7,7 @@ CONFIG_JSON_FILE = os.path.join(PRE_TRAINED_MODEL_DIR, "bert_config.json")
 MAX_SEQ_LENGTH = int(os.getenv("MAX_SEQ_LENGTH"))
 PROCESSED_DATASET_DIR = os.getenv("PROCESSED_DATASET_DIR")
 MODEL_OUTPUT_DIR = os.getenv("MODEL_OUTPUT_DIR")
+ML_FLOW_SAVE_DIR = os.getenv("ML_FLOW_SAVE_DIR")
 
 """
 here "X" used to represent "##eer","##soo" and so on!

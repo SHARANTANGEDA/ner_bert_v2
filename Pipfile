@@ -9,6 +9,7 @@ pandas = "*"
 tensorflow-addons = "*"
 tf-models-official = "==2.3.0"
 numpy = "*"
+mlflow = "*"
 
 [dev-packages]
 

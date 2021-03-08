@@ -23,7 +23,7 @@ import numpy as np
 def train_test(epochs, train_batch_size, eval_batch_size, warmup_proportion=0.1, init_lr=2e-5):
     """Create Features & Tokenize"""
     logging.getLogger().setLevel(logging.INFO)
-    tokenizer = bert.bert_tokenization.FullTokenizer(c.BERT_VOCAB_FILE, do_lower_case=True)
+    tokenizer = bert.tokenization.FullTokenizer(c.BERT_VOCAB_FILE, do_lower_case=True)
     logging.info(f'Vocab Size: {tokenizer.vocab}')
     train_data = pre_process.get_input_list(os.path.join(c.PROCESSED_DATASET_DIR, c.TRAIN_FILE), c.TRAIN_FILE)
     test_data = pre_process.get_input_list(os.path.join(c.PROCESSED_DATASET_DIR, c.TEST_FILE), c.TEST_FILE)

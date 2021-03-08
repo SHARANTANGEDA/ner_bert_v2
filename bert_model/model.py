@@ -52,9 +52,9 @@ def train_test(epochs, train_batch_size, eval_batch_size, warmup_proportion=0.1,
     # Plot BERT Encoder
     keras.utils.plot_model(bert_encoder, show_shapes=True, dpi=50, to_file='model_encoder.png')
     
-    # Restore from last checkpoint
-    checkpoint = tf.train.Checkpoint(model=bert_encoder)
-    checkpoint.restore(c.BERT_MODEL_FILE).assert_consumed()
+    # # Restore from last checkpoint
+    # checkpoint = tf.train.Checkpoint(model=bert_encoder)
+    # checkpoint.restore(c.BERT_MODEL_FILE).assert_consumed()
     
     print("Pre-processing and plotting is done")
     

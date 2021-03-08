@@ -85,7 +85,7 @@ def convert_seq_to_feature(data_row_idx, data_row, label_map, max_seq_length, to
         'input_type_ids': tf.zeros_like(input_word_ids)
     }
     # we need no_tokens because if we do predict it can help us return to original token.
-    return padded_tokens, label_ids, inputs
+    return padded_tokens, tf.convert_to_tensor(label_ids), inputs
 
 
 def convert_data_into_features(train_data, label_list, max_seq_length, tokenizer, tf_record_file, label2id_pkl_file):
@@ -120,37 +120,3 @@ def convert_data_into_features(train_data, label_list, max_seq_length, tokenizer
     # sentence token in each batch
     record_writer.close()
     return batch_tokens, batch_labels, batch_inputs
-
-
-def file_based_input_fn_builder(input_file, seq_length, is_training, drop_remainder):
-    name_to_features = {
-        "input_ids": tf.FixedLenFeature([seq_length], tf.int64),
-        "mask": tf.FixedLenFeature([seq_length], tf.int64),
-        "segment_ids": tf.FixedLenFeature([seq_length], tf.int64),
-        "label_ids": tf.FixedLenFeature([seq_length], tf.int64),
-        
-    }
-    
-    def _decode_record(record, name_to_features):
-        example = tf.parse_single_example(record, name_to_features)
-        for name in list(example.keys()):
-            t = example[name]
-            if t.dtype == tf.int64:
-                t = tf.to_int32(t)
-            example[name] = t
-        return example
-    
-    def input_fn(params):
-        batch_size = params["batch_size"]
-        d = tf.data.TFRecordDataset(input_file)
-        if is_training:
-            d = d.repeat()
-            d = d.shuffle(buffer_size=100)
-        d = d.apply(tf.data.experimental.map_and_batch(
-            lambda record: _decode_record(record, name_to_features),
-            batch_size=batch_size,
-            drop_remainder=drop_remainder
-        ))
-        return d
-    
-    return input_fn

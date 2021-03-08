@@ -13,5 +13,5 @@ mlflow = "*"
 
 [dev-packages]
 
-[requires]
-python_version = "3.7"
+#[requires]
+#python_version = "3.7"

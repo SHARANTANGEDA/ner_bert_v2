@@ -18,8 +18,8 @@ def _create_example(df, set_type):
     examples = []
     for (idx, line) in df.iterrows():
         guid = "%s-%s" % (set_type, idx)
-        texts = bert.bert_tokenization.convert_to_unicode(line[0])
-        labels = bert.bert_tokenization.convert_to_unicode(line[1])
+        texts = bert.tokenization.convert_to_unicode(line[0])
+        labels = bert.tokenization.convert_to_unicode(line[1])
         examples.append(InputItem(guid=guid, text=texts, label=labels))
     return examples
 

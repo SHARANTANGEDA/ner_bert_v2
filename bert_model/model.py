@@ -46,10 +46,11 @@ def train_test(epochs, train_batch_size, eval_batch_size, warmup_proportion=0.1,
                                                                       max_seq_length=c.MAX_SEQ_LENGTH)
     
     # Plot Model Image
-    keras.utils.plot_model(bert_classifier, show_shapes=True, show_layer_names=True, dpi=50)
+    keras.utils.plot_model(bert_classifier, show_shapes=True, show_layer_names=True, dpi=50,
+                           to_file='model_classifier.png')
     
     # Plot BERT Encoder
-    keras.utils.plot_model(bert_encoder, show_shapes=True, dpi=50)
+    keras.utils.plot_model(bert_encoder, show_shapes=True, dpi=50, to_file='model_encoder.png')
     
     # Restore from last checkpoint
     checkpoint = tf.train.Checkpoint(model=bert_encoder)

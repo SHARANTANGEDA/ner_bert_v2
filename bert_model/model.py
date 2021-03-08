@@ -56,6 +56,8 @@ def train_test(epochs, train_batch_size, eval_batch_size, warmup_proportion=0.1,
     checkpoint = tf.train.Checkpoint(model=bert_encoder)
     checkpoint.restore(c.BERT_MODEL_FILE).assert_consumed()
     
+    print("Pre-processing and plotting is done")
+    
     # Add Adam Optimizer
     optimizer = nlp.optimization.create_optimizer(init_lr, num_train_steps=num_train_steps,
                                                   num_warmup_steps=warmup_steps, optimizer_type='adamw')

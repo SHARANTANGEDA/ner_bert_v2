@@ -2,10 +2,6 @@ import logging
 import pickle
 
 import tensorflow as tf
-from official.nlp import bert
-
-# Load the required submodules
-import official.nlp.bert.tokenization
 
 
 class InputFeatures(object):
@@ -74,7 +70,6 @@ def convert_seq_to_feature(data_row_idx, data_row, label_map, max_seq_length, to
     if data_row_idx < 3:
         logging.info("*** Example ***")
         logging.info(f'guid: {data_row.guid}')
-        logging.info(f'tokens: {" ".join([bert.tokenization.printable_text(x) for x in tokens])}')
         logging.info(f'input_ids: {" ".join([str(x) for x in input_word_ids])}')
         logging.info(f'input_mask: {" ".join([str(x) for x in input_mask])}')
         logging.info(f'input_type_ids: {" ".join([str(x) for x in input_type_ids])}')
@@ -85,7 +80,7 @@ def convert_seq_to_feature(data_row_idx, data_row, label_map, max_seq_length, to
         'input_type_ids': tf.zeros_like(input_word_ids)
     }
     # we need no_tokens because if we do predict it can help us return to original token.
-    return padded_tokens, tf.convert_to_tensor(label_ids), inputs
+    return padded_tokens, label_ids, inputs
 
 
 def convert_data_into_features(train_data, label_list, max_seq_length, tokenizer, tf_record_file, label2id_pkl_file):

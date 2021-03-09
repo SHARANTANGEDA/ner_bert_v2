@@ -3,35 +3,24 @@ import os
 import pickle
 from datetime import datetime
 
-import constants as c
+from transformers import BertConfig, TFBertForTokenClassification, BertTokenizer
 from metrics.metrics import recall_m, precision_m, f1_m
-from ner_utils import pre_process, extract_features
 from tensorflow import keras
 import tensorflow as tf
-
-from official import nlp
-from official.nlp import bert
-
-# Load the required submodules
-import official.nlp.optimization
-import official.nlp.bert.bert_models
-import official.nlp.bert.configs
-import official.nlp.bert.tokenization
 import numpy as np
 
+from ner_utils import pre_process, extract_features
+import constants as c
 
-def train_test(epochs, train_batch_size, eval_batch_size, warmup_proportion=0.1, init_lr=2e-5):
+
+def train_test(epochs, eval_batch_size, epsilon=1e-7, init_lr=2e-5, beta_1=0.9, beta_2=0.999):
     """Create Features & Tokenize"""
     logging.getLogger().setLevel(logging.INFO)
-    tokenizer = bert.tokenization.FullTokenizer(c.BERT_VOCAB_FILE, do_lower_case=True)
-    logging.info(f'Vocab Size: {tokenizer.vocab}')
     train_data = pre_process.get_input_list(os.path.join(c.PROCESSED_DATASET_DIR, c.TRAIN_FILE), c.TRAIN_FILE)
     test_data = pre_process.get_input_list(os.path.join(c.PROCESSED_DATASET_DIR, c.TEST_FILE), c.TEST_FILE)
     val_data = pre_process.get_input_list(os.path.join(c.PROCESSED_DATASET_DIR, c.VALIDATION_FILE), c.VALIDATION_FILE)
     
-    train_data_size = len(train_data)
-    num_train_steps = int(train_data_size / train_batch_size * epochs)
-    warmup_steps = int(epochs * warmup_proportion * train_data_size / train_batch_size)
+    tokenizer = BertTokenizer.from_pretrained(c.BERT_VOCAB_FILE, do_lower_case=False)
     
     _, batch_train_labels, batch_train_inputs = extract_features.convert_data_into_features(
         train_data, c.LABELS, c.MAX_SEQ_LENGTH, tokenizer, c.TENSOR_TRAIN_FEATURES_RECORD_FILE, c.LABEL_ID_PKL_FILE)
@@ -40,52 +29,33 @@ def train_test(epochs, train_batch_size, eval_batch_size, warmup_proportion=0.1,
     _, batch_test_labels, batch_test_inputs = extract_features.convert_data_into_features(
         test_data, c.LABELS, c.MAX_SEQ_LENGTH, tokenizer, c.TENSOR_TEST_FEATURES_RECORD_FILE, c.LABEL_ID_PKL_FILE)
     
-    # Initialize BERT Model
-    bert_config = bert.configs.BertConfig.from_json_file(c.BERT_CONFIG_JSON_FILE)
-    bert_classifier, bert_encoder = bert.bert_models.classifier_model(bert_config, num_labels=len(c.LABELS),
-                                                                      max_seq_length=c.MAX_SEQ_LENGTH)
+    config = BertConfig.from_pretrained(c.CONFIG_JSON_FILE, num_labels=len(c.LABELS))
+    model = TFBertForTokenClassification.from_pretrained(c.BERT_MODEL_FILE, from_pt=False, config=config)
     
-    # Plot Model Image
-    keras.utils.plot_model(bert_classifier, show_shapes=True, show_layer_names=True, dpi=50,
-                           to_file='model_classifier.png')
+    model.layers[-1].activation = tf.keras.activations.softmax
+    optimizer = tf.keras.optimizers.Adam(learning_rate=init_lr, epsilon=epsilon, beta_1=beta_1, beta_2=beta_2)
     
-    # Plot BERT Encoder
-    keras.utils.plot_model(bert_encoder, show_shapes=True, dpi=50, to_file='model_encoder.png')
-    
-    # # Restore from last checkpoint
-    # checkpoint = tf.train.Checkpoint(model=bert_encoder)
-    # checkpoint.restore(c.BERT_MODEL_FILE).assert_consumed()
-    
-    print("Pre-processing and plotting is done")
-    
-    # Add Adam Optimizer
-    optimizer = nlp.optimization.create_optimizer(init_lr, num_train_steps=num_train_steps,
-                                                  num_warmup_steps=warmup_steps, optimizer_type='adamw')
-    
-    # Train the model
     metrics = [keras.metrics.SparseCategoricalAccuracy('accuracy', dtype=tf.float32), recall_m, precision_m, f1_m]
     loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
     
-    bert_classifier.compile(
-        optimizer=optimizer,
-        loss=loss,
-        metrics=metrics)
+    keras.utils.plot_model(model, show_shapes=True, show_layer_names=True, dpi=50,
+                           to_file='model.png')
+    print("Pre-processing and plotting is done")
     
-    bert_classifier.fit(
-        batch_train_inputs, batch_train_labels,
-        validation_data=(batch_val_inputs, batch_val_labels),
-        batch_size=train_batch_size,
-        epochs=epochs)
+    model.compile(optimizer=optimizer, loss=loss, metrics=metrics)
+
+    model.fit(batch_train_inputs, batch_train_labels, epochs=epochs,
+              validation_data=(batch_val_inputs, batch_val_labels))
     
     # Save Model
     save_dir_path = os.path.join(c.FINAL_OUTPUT_DIR, str(datetime.utcnow()))
     os.mkdir(save_dir_path)
-    tf.saved_model.save(bert_classifier, export_dir=save_dir_path)
+    tf.saved_model.save(model, export_dir=save_dir_path)
     
     # Test Scores
-    test_loss, test_acc, test_recall, test_precision, test_f_score = bert_classifier.evaluate(batch_test_inputs,
-                                                                                              batch_test_labels,
-                                                                                              batch_size=eval_batch_size)
+    test_loss, test_acc, test_recall, test_precision, test_f_score = model.evaluate(batch_test_inputs,
+                                                                                    batch_test_labels,
+                                                                                    batch_size=eval_batch_size)
     logging.info("****TEST METRICS****")
     logging.info(f'Test Loss: {test_loss}')
     logging.info(f'Test Accuracy: {test_acc}')

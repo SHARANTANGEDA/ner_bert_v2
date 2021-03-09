@@ -7,11 +7,11 @@ name = "pypi"
 tensorflow = "*"
 pandas = "*"
 tensorflow-addons = "*"
-tf-models-official = "==2.3.0"
 numpy = "*"
 mlflow = "*"
 pydot = "*"
 graphviz = "*"
+transformers = "*"
 
 [dev-packages]
 #[requires]

@@ -20,7 +20,7 @@ def train_test(epochs, eval_batch_size, epsilon=1e-7, init_lr=2e-5, beta_1=0.9, 
     test_data = pre_process.get_input_list(os.path.join(c.PROCESSED_DATASET_DIR, c.TEST_FILE), c.TEST_FILE)
     val_data = pre_process.get_input_list(os.path.join(c.PROCESSED_DATASET_DIR, c.VALIDATION_FILE), c.VALIDATION_FILE)
     
-    tokenizer = BertTokenizer.from_pretrained(c.BERT_VOCAB_FILE, do_lower_case=False)
+    tokenizer = BertTokenizer.from_pretrained('bert-base-multilingual-cased', do_lower_case=False)
     
     _, batch_train_labels, batch_train_inputs = extract_features.convert_data_into_features(
         train_data, c.LABELS, c.MAX_SEQ_LENGTH, tokenizer, c.TENSOR_TRAIN_FEATURES_RECORD_FILE, c.LABEL_ID_PKL_FILE)
@@ -29,9 +29,8 @@ def train_test(epochs, eval_batch_size, epsilon=1e-7, init_lr=2e-5, beta_1=0.9, 
     _, batch_test_labels, batch_test_inputs = extract_features.convert_data_into_features(
         test_data, c.LABELS, c.MAX_SEQ_LENGTH, tokenizer, c.TENSOR_TEST_FEATURES_RECORD_FILE, c.LABEL_ID_PKL_FILE)
     
-    config = BertConfig.from_pretrained(c.CONFIG_JSON_FILE, num_labels=len(c.LABELS))
-    model = TFBertForTokenClassification.from_pretrained(c.PRE_TRAINED_MODEL_DIR, from_pt=False, config=config,
-                                                         local_files_only=True)
+    config = BertConfig.from_pretrained('bert-base-multilingual-cased', num_labels=len(c.LABELS))
+    model = TFBertForTokenClassification.from_pretrained("bert-base-multilingual-cased", config=config)
     
     model.layers[-1].activation = tf.keras.activations.softmax
     optimizer = tf.keras.optimizers.Adam(learning_rate=init_lr, epsilon=epsilon, beta_1=beta_1, beta_2=beta_2)

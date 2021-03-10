@@ -40,17 +40,22 @@ def train_test(epochs, eval_batch_size, epsilon=1e-7, init_lr=2e-5, beta_1=0.9, 
     
     keras.utils.plot_model(model, show_shapes=True, show_layer_names=True, dpi=50,
                            to_file='model.png')
-    print("Pre-processing and plotting is done")
+    
+    logging.info("Pre-processing and plotting is done")
     
     model.compile(optimizer=optimizer, loss=loss, metrics=metrics)
 
     model.fit(batch_train_inputs, batch_train_labels, epochs=epochs,
               validation_data=(batch_val_inputs, batch_val_labels))
     
+    logging.info("Model Fitting is done")
+
+    
     # Save Model
     save_dir_path = os.path.join(c.FINAL_OUTPUT_DIR, str(datetime.utcnow()))
     os.mkdir(save_dir_path)
     tf.saved_model.save(model, export_dir=save_dir_path)
+    logging.info("Model Fitting is done")
     
     # Test Scores
     test_loss, test_acc, test_recall, test_precision, test_f_score = model.evaluate(batch_test_inputs,

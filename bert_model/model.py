@@ -24,10 +24,6 @@ def train_test(epochs, eval_batch_size, epsilon=1e-7, init_lr=2e-5, beta_1=0.9, 
     
     _, batch_train_labels, batch_train_inputs = extract_features.convert_data_into_features(
         train_data, c.LABELS, c.MAX_SEQ_LENGTH, tokenizer, c.TENSOR_TRAIN_FEATURES_RECORD_FILE, c.LABEL_ID_PKL_FILE)
-    _, batch_val_labels, batch_val_inputs = extract_features.convert_data_into_features(
-        val_data, c.LABELS, c.MAX_SEQ_LENGTH, tokenizer, c.TENSOR_VAL_FEATURES_RECORD_FILE, c.LABEL_ID_PKL_FILE)
-    _, batch_test_labels, batch_test_inputs = extract_features.convert_data_into_features(
-        test_data, c.LABELS, c.MAX_SEQ_LENGTH, tokenizer, c.TENSOR_TEST_FEATURES_RECORD_FILE, c.LABEL_ID_PKL_FILE)
     
     config = BertConfig.from_pretrained('bert-base-multilingual-cased', num_labels=len(c.LABELS))
     model = TFBertForTokenClassification.from_pretrained("bert-base-multilingual-cased", config=config)
@@ -44,18 +40,26 @@ def train_test(epochs, eval_batch_size, epsilon=1e-7, init_lr=2e-5, beta_1=0.9, 
     logging.info("Pre-processing and plotting is done")
     
     model.compile(optimizer=optimizer, loss=loss, metrics=metrics)
-
+    
+    logging.info("Model has been compiled")
+    
+    _, batch_val_labels, batch_val_inputs = extract_features.convert_data_into_features(
+        val_data, c.LABELS, c.MAX_SEQ_LENGTH, tokenizer, c.TENSOR_VAL_FEATURES_RECORD_FILE, c.LABEL_ID_PKL_FILE)
+    _, batch_test_labels, batch_test_inputs = extract_features.convert_data_into_features(
+        test_data, c.LABELS, c.MAX_SEQ_LENGTH, tokenizer, c.TENSOR_TEST_FEATURES_RECORD_FILE, c.LABEL_ID_PKL_FILE)
+    
+    logging.info("Test Validation features are ready")
+    
     model.fit(batch_train_inputs, batch_train_labels, epochs=epochs,
               validation_data=(batch_val_inputs, batch_val_labels))
     
     logging.info("Model Fitting is done")
-
     
     # Save Model
     save_dir_path = os.path.join(c.FINAL_OUTPUT_DIR, str(datetime.utcnow()))
     os.mkdir(save_dir_path)
     tf.saved_model.save(model, export_dir=save_dir_path)
-    logging.info("Model Fitting is done")
+    logging.info("Model Saved")
     
     # Test Scores
     test_loss, test_acc, test_recall, test_precision, test_f_score = model.evaluate(batch_test_inputs,

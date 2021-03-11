@@ -13,5 +13,6 @@ logging.basicConfig(filename=os.path.join(c.LOGS_DIR, f'{datetime.now()}.txt'),
                     level=logging.DEBUG)
 
 mlflow.tensorflow.autolog(log_models=True, disable=False, exclusive=False)
-save_dir_path = train_test(epochs=3, eval_batch_size=32, beta_1=0.9, beta_2=0.999, init_lr=2e-5)
-mlflow.tensorflow.save_model(save_dir_path, path=c.ML_FLOW_SAVE_DIR)
+with mlflow.start_run():
+    save_dir_path = train_test(epochs=3, eval_batch_size=32, beta_1=0.9, beta_2=0.999, init_lr=2e-5)
+    mlflow.tensorflow.save_model(save_dir_path, path=c.ML_FLOW_SAVE_DIR)

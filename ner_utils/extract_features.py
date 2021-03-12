@@ -1,36 +1,12 @@
-import logging
 import os
 import pickle
-from tqdm import tqdm, trange
+from tqdm import tqdm
 
-from tensorflow import keras
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 import tensorflow as tf
 
 from ner_utils.pre_process import read_dataset, example_to_features
 import constants as c
-
-
-class InputFeatures(object):
-    """A single set of features of data."""
-    
-    def __init__(self, input_ids, mask, segment_ids, label_ids, is_real_example=True):
-        self.input_ids = input_ids
-        self.mask = mask
-        self.segment_ids = segment_ids
-        self.label_ids = label_ids
-        self.is_real_example = is_real_example
-
-
-def create_int_feature(values):
-    f = tf.train.Feature(int64_list=tf.train.Int64List(value=list(values)))
-    return f
-
-
-def encode_sentence(s, tokenizer):
-    tokens = list(tokenizer.tokenize(s))
-    tokens.append('[SEP]')
-    return tokenizer.convert_tokens_to_ids(tokens)
 
 
 def convert_to_input(sentences, tags, tokenizer, label_map, max_seq_length):

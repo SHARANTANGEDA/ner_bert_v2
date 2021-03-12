@@ -9,24 +9,21 @@ from tensorflow import keras
 import tensorflow as tf
 import numpy as np
 
-from ner_utils import pre_process, extract_features
+from ner_utils import extract_features
 import constants as c
 
 
 def train_test(epochs, eval_batch_size, epsilon=1e-7, init_lr=2e-5, beta_1=0.9, beta_2=0.999):
     """Create Features & Tokenize"""
     logging.getLogger().setLevel(logging.INFO)
-    train_data = pre_process.get_input_list(os.path.join(c.PROCESSED_DATASET_DIR, c.TRAIN_FILE), c.TRAIN_FILE)
-    test_data = pre_process.get_input_list(os.path.join(c.PROCESSED_DATASET_DIR, c.TEST_FILE), c.TEST_FILE)
-    val_data = pre_process.get_input_list(os.path.join(c.PROCESSED_DATASET_DIR, c.VALIDATION_FILE), c.VALIDATION_FILE)
     
-    tokenizer = BertTokenizer.from_pretrained('bert-base-multilingual-cased', do_lower_case=False)
-    
-    _, batch_train_labels, batch_train_inputs = extract_features.convert_data_into_features(
-        train_data, c.LABELS, c.MAX_SEQ_LENGTH, tokenizer, c.TENSOR_TRAIN_FEATURES_RECORD_FILE, c.LABEL_ID_PKL_FILE)
+    tokenizer = BertTokenizer.from_pretrained('bert-base-multilingual-cased', do_lower_case=True)
+    train_data = extract_features.retrieve_features(c.TRAIN_FILE, c.LABELS, c.MAX_SEQ_LENGTH, tokenizer,
+                                                    c.LABEL_ID_PKL_FILE)
     
     config = BertConfig.from_pretrained('bert-base-multilingual-cased', num_labels=len(c.LABELS))
     model = TFBertForTokenClassification.from_pretrained("bert-base-multilingual-cased", config=config)
+    model.summary()
     
     model.layers[-1].activation = tf.keras.activations.softmax
     optimizer = tf.keras.optimizers.Adam(learning_rate=init_lr, epsilon=epsilon, beta_1=beta_1, beta_2=beta_2)
@@ -34,24 +31,20 @@ def train_test(epochs, eval_batch_size, epsilon=1e-7, init_lr=2e-5, beta_1=0.9, 
     metrics = [keras.metrics.SparseCategoricalAccuracy('accuracy', dtype=tf.float32), recall_m, precision_m, f1_m]
     loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
     
-    keras.utils.plot_model(model, show_shapes=True, show_layer_names=True, dpi=50,
-                           to_file='model.png')
-    
-    logging.info("Pre-processing and plotting is done")
+    logging.info("Compiling Model ...")
     
     model.compile(optimizer=optimizer, loss=loss, metrics=metrics)
     
     logging.info("Model has been compiled")
     
-    _, batch_val_labels, batch_val_inputs = extract_features.convert_data_into_features(
-        val_data, c.LABELS, c.MAX_SEQ_LENGTH, tokenizer, c.TENSOR_VAL_FEATURES_RECORD_FILE, c.LABEL_ID_PKL_FILE)
-    _, batch_test_labels, batch_test_inputs = extract_features.convert_data_into_features(
-        test_data, c.LABELS, c.MAX_SEQ_LENGTH, tokenizer, c.TENSOR_TEST_FEATURES_RECORD_FILE, c.LABEL_ID_PKL_FILE)
+    val_data = extract_features.retrieve_features(c.VALIDATION_FILE, c.LABELS, c.MAX_SEQ_LENGTH, tokenizer,
+                                                  c.LABEL_ID_PKL_FILE)
+    test_data = extract_features.retrieve_features(c.TEST_FILE, c.LABELS, c.MAX_SEQ_LENGTH, tokenizer,
+                                                   c.LABEL_ID_PKL_FILE)
     
     logging.info("Test Validation features are ready")
     
-    model.fit(batch_train_inputs, batch_train_labels, epochs=epochs,
-              validation_data=(batch_val_inputs, batch_val_labels))
+    model.fit(train_data, epochs=epochs, validation_data=val_data)
     
     logging.info("Model Fitting is done")
     
@@ -62,8 +55,7 @@ def train_test(epochs, eval_batch_size, epsilon=1e-7, init_lr=2e-5, beta_1=0.9, 
     logging.info("Model Saved")
     
     # Test Scores
-    test_loss, test_acc, test_recall, test_precision, test_f_score = model.evaluate(batch_test_inputs,
-                                                                                    batch_test_labels,
+    test_loss, test_acc, test_recall, test_precision, test_f_score = model.evaluate(test_data,
                                                                                     batch_size=eval_batch_size)
     logging.info("****TEST METRICS****")
     logging.info(f'Test Loss: {test_loss}')

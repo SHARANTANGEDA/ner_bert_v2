@@ -1,28 +1,19 @@
 import pandas as pd
-from official.nlp import bert
-
-# Load the required submodules
-import official.nlp.bert.tokenization
 
 
-class InputItem(object):
-    """A single training/test example for simple sequence classification."""
-    
-    def __init__(self, guid, text, label=None):
-        self.guid = guid
-        self.text = text
-        self.label = label
-
-
-def _create_example(df, set_type):
-    examples = []
+def _create_example(df):
+    sentences, labels = [], []
     for (idx, line) in df.iterrows():
-        guid = "%s-%s" % (set_type, idx)
-        texts = bert.tokenization.convert_to_unicode(line[0])
-        labels = bert.tokenization.convert_to_unicode(line[1])
-        examples.append(InputItem(guid=guid, text=texts, label=labels))
-    return examples
+        sentences.append(line[0])
+        labels.append(line[1])
+    return sentences, labels
 
 
-def get_input_list(file_path, set_type):
-    return _create_example(pd.read_csv(file_path), set_type)
+def read_dataset(file_path):
+    return _create_example(pd.read_csv(file_path))
+
+
+def example_to_features(input_ids, attention_masks, token_type_ids, y):
+    return {"input_ids": input_ids,
+            "attention_mask": attention_masks,
+            "token_type_ids": token_type_ids}, y

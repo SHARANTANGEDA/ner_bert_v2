@@ -12,6 +12,7 @@ mlflow = "*"
 pydot = "*"
 graphviz = "*"
 transformers = "*"
+tqdm = "*"
 
 [dev-packages]
 #[requires]

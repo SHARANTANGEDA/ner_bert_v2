@@ -1,8 +1,10 @@
 import logging
 import os
 import pickle
+import uuid
 from datetime import datetime
 
+import mlflow
 from transformers import BertConfig, TFBertForTokenClassification, BertTokenizer
 from metrics.metrics import recall_m, precision_m, f1_m
 from tensorflow import keras
@@ -14,9 +16,10 @@ import constants as c
 
 
 def train_test(epochs, eval_batch_size, epsilon=1e-7, init_lr=2e-5, beta_1=0.9, beta_2=0.999):
+    mlflow.log_params({"epochs": epochs, "eval_batch_size": eval_batch_size, "epsilon": epsilon,
+                       "init_lr": init_lr, "beta_1": beta_1, "beta_2": beta_2})
+
     """Create Features & Tokenize"""
-    logging.getLogger().setLevel(logging.INFO)
-    
     tokenizer = BertTokenizer.from_pretrained('bert-base-multilingual-cased', do_lower_case=True)
     train_data = extract_features.retrieve_features(c.TRAIN_FILE, c.LABELS, c.MAX_SEQ_LENGTH, tokenizer,
                                                     c.LABEL_ID_PKL_FILE)
@@ -57,13 +60,16 @@ def train_test(epochs, eval_batch_size, epsilon=1e-7, init_lr=2e-5, beta_1=0.9, 
     # Test Scores
     test_loss, test_acc, test_recall, test_precision, test_f_score = model.evaluate(test_data,
                                                                                     batch_size=eval_batch_size)
+    
+    metrics_dict = {"Loss": test_loss, "Accuracy": test_acc, "Recall": test_recall, "Precision": test_precision,
+                    "F1_Score": test_f_score}
     logging.info("****TEST METRICS****")
-    logging.info(f'Test Loss: {test_loss}')
-    logging.info(f'Test Accuracy: {test_acc}')
-    logging.info(f'Test Recall: {test_recall}')
-    logging.info(f'Test Precision: {test_precision}')
-    logging.info(f'Test F1_Score: {test_f_score}')
-    return save_dir_path
+    logging.info(str(metrics_dict))
+    mlflow.log_metrics(metrics_dict)
+
+    return save_dir_path, [
+        f'epochs:{epochs}', f'eval_batch_size: {eval_batch_size}', f'epsilon: {epsilon}', f'init_lr: {init_lr}',
+        f'beta_1: {beta_1}', f'beta_2: {beta_2}'], f'bert_{test_acc}_{test_f_score}_{uuid.uuid4()}'
 
 
 def serve_with_saved_model(formatted_data, saved_classifier):

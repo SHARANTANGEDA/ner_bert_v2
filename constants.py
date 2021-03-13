@@ -9,6 +9,7 @@ PROCESSED_DATASET_DIR = os.getenv("PROCESSED_DATASET_DIR")
 MODEL_OUTPUT_DIR = os.getenv("MODEL_OUTPUT_DIR")
 ML_FLOW_SAVE_DIR = os.getenv("ML_FLOW_SAVE_DIR")
 LOGS_DIR = os.getenv("LOGS_DIR")
+ML_FLOW_EXPERIMENT_ID = os.getenv("ML_FLOW_EXPERIMENT_ID", 0)
 
 """
 here "X" used to represent "##eer","##soo" and so on!

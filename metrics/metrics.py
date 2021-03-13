@@ -19,7 +19,6 @@ class F1Metric(Callback):
         self.val_recalls.append(_val_recall)
         self.val_precisions.append(_val_precision)
         print(" — val_f1: % f — val_precision: % f — val_recall % f" % (_val_f1, _val_precision, _val_recall))
-        return _val_f1
     #
     # def on_batch_end(self, batch, logs=None):
     #     val_predict = (np.asarray(self.model.predict(self.model.validation_data[0]))).round()

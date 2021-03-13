@@ -11,6 +11,7 @@ from tensorflow import keras
 import tensorflow as tf
 import numpy as np
 
+from metrics.metrics import F1Metric
 from ner_utils import extract_features
 import constants as c
 
@@ -31,8 +32,7 @@ def train_test(epochs, eval_batch_size, epsilon=1e-7, init_lr=2e-5, beta_1=0.9, 
     model.layers[-1].activation = tf.keras.activations.softmax
     optimizer = tf.keras.optimizers.Adam(learning_rate=init_lr, epsilon=epsilon, beta_1=beta_1, beta_2=beta_2)
     
-    metrics = [keras.metrics.SparseCategoricalAccuracy('accuracy', dtype=tf.float32), 'precision', 'recall',
-               'fbeta_score', 'mean_squared_error']
+    metrics = [keras.metrics.SparseCategoricalAccuracy('accuracy', dtype=tf.float32), F1Metric()]
     loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
     
     logging.info("Compiling Model ...")
@@ -59,10 +59,8 @@ def train_test(epochs, eval_batch_size, epsilon=1e-7, init_lr=2e-5, beta_1=0.9, 
     logging.info("Model Saved")
     
     # Test Scores
-    test_loss, test_acc, test_recall, test_precision, test_f_beta_score, test_mse = model.evaluate(
-        test_data, batch_size=eval_batch_size)
-    logging.info({"Loss": test_loss, "Accuracy": test_acc, "Recall": test_recall, "Precision": test_precision,
-                  "F_Beta_Score": test_f_beta_score, "TEST_MSE": test_mse})
+    test_loss, test_acc = model.evaluate(test_data, batch_size=eval_batch_size)
+    logging.info({"Loss": test_loss, "Accuracy": test_acc})
     
     # evaluate model with sklearn
     predictions = model.predict(test_data[0], batch_size=eval_batch_size, verbose=1)
@@ -75,8 +73,7 @@ def train_test(epochs, eval_batch_size, epsilon=1e-7, init_lr=2e-5, beta_1=0.9, 
     logging.info(sk_report)
     
     logging.info("****TEST METRICS****")
-    metrics_dict = {"Loss": test_loss, "Accuracy": test_acc, "Recall": test_recall, "Precision": test_precision,
-                    "F_Beta_Score": test_f_beta_score, "TEST_MSE": test_mse, "Micro_F_Score": f1_score_sk}
+    metrics_dict = {"Loss": test_loss, "Accuracy": test_acc, "Micro_F_Score": f1_score_sk}
     logging.info(str(metrics_dict))
     mlflow.log_metrics(metrics_dict)
     

@@ -4,12 +4,12 @@ from sklearn.metrics import f1_score, precision_score, recall_score
 
 
 class F1Metric(Callback):
-    def on_train_begin(self, logs=None):
+    def on_train_begin(self, logs={}):
         self.val_f1s = []
         self.val_recalls = []
         self.val_precisions = []
     
-    def on_epoch_end(self, epoch, logs=None):
+    def on_epoch_end(self, epoch, logs={}):
         val_predict = (np.asarray(self.model.predict(self.model.validation_data[0]))).round()
         val_targ = self.model.validation_data[1]
         _val_f1 = f1_score(val_targ, val_predict)

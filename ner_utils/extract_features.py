@@ -71,10 +71,9 @@ def retrieve_features(data_type, label_list, max_seq_length, tokenizer, label2id
                                                    label_ids)).map(example_to_features)
     else:
         dataset = tf.data.Dataset.from_tensor_slices((input_ids, attention_masks, token_ids,
-                                                   label_ids)).map(example_to_features)
-        inputs, labels = [], []
-        for row in dataset:
-            inputs.append(row[0])
-            labels.append(row[1])
-    
-        return dataset, inputs, labels
+                                                      label_ids)).map(example_to_features)
+        inputs = []
+        for idx, row in enumerate(input_ids):
+            inputs.append(dict_from_input_data(row, attention_masks[idx], token_ids[idx]))
+        
+        return dataset, inputs, label_ids

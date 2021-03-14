@@ -10,7 +10,7 @@ class F1Metric(Callback):
         self.val_precisions = []
     
     def on_epoch_end(self, epoch, logs={}):
-        val_predict = (np.asarray(self.model.predict(self.model.validation_data[0]))).round()
+        val_predict = (np.asarray(self.model.predict(self.validation_data[0]))).round()
         val_targ = self.model.validation_data[1]
         _val_f1 = f1_score(val_targ, val_predict)
         _val_recall = recall_score(val_targ, val_predict)

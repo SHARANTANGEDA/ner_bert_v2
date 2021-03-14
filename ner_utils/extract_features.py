@@ -5,7 +5,7 @@ from tqdm import tqdm
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 import tensorflow as tf
 
-from ner_utils.pre_process import read_dataset, example_to_features
+from ner_utils.pre_process import read_dataset, example_to_features, dict_from_input_data
 import constants as c
 
 
@@ -65,6 +65,16 @@ def retrieve_features(data_type, label_list, max_seq_length, tokenizer, label2id
                                     padding="post")
     label_ids = pad_sequences(label_id_list, maxlen=max_seq_length, dtype="long", truncating="post",
                               padding="post")
-
-    return tf.data.Dataset.from_tensor_slices((input_ids, attention_masks, token_ids,
-                                               label_ids)).map(example_to_features)
+    
+    if data_type == c.TRAIN_FILE:
+        return tf.data.Dataset.from_tensor_slices((input_ids, attention_masks, token_ids,
+                                                   label_ids)).map(example_to_features)
+    else:
+        dataset = tf.data.Dataset.from_tensor_slices((input_ids, attention_masks, token_ids,
+                                                   label_ids)).map(example_to_features)
+        inputs, labels = [], []
+        for row in dataset:
+            inputs.append(row[0])
+            labels.append(row[1])
+    
+        return dataset, inputs, labels

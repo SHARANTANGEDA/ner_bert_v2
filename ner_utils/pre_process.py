@@ -17,3 +17,9 @@ def example_to_features(input_ids, attention_masks, token_type_ids, y):
     return {"input_ids": input_ids,
             "attention_mask": attention_masks,
             "token_type_ids": token_type_ids}, y
+
+
+def dict_from_input_data(input_ids, attention_masks, token_type_ids):
+    return {"input_ids": input_ids,
+            "attention_mask": attention_masks,
+            "token_type_ids": token_type_ids}

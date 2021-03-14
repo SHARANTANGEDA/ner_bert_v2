@@ -41,14 +41,15 @@ def train_test(epochs, eval_batch_size, epsilon=1e-7, init_lr=2e-5, beta_1=0.9, 
     
     logging.info("Model has been compiled")
     
-    val_data = extract_features.retrieve_features(c.VALIDATION_FILE, c.LABELS, c.MAX_SEQ_LENGTH, tokenizer,
-                                                  c.LABEL_ID_PKL_FILE)
-    test_data = extract_features.retrieve_features(c.TEST_FILE, c.LABELS, c.MAX_SEQ_LENGTH, tokenizer,
-                                                   c.LABEL_ID_PKL_FILE)
+    val_data, val_inputs, val_labels = extract_features.retrieve_features(c.VALIDATION_FILE, c.LABELS, c.MAX_SEQ_LENGTH,
+                                                                          tokenizer, c.LABEL_ID_PKL_FILE)
+    test_data, test_inputs, test_labels = extract_features.retrieve_features(c.TEST_FILE, c.LABELS, c.MAX_SEQ_LENGTH,
+                                                                             tokenizer, c.LABEL_ID_PKL_FILE)
     
     logging.info("Test Validation features are ready")
     
-    f1_metric = F1Metric(val_data)
+    f1_metric = F1Metric((val_inputs, val_labels))
+    
     model.fit(train_data, epochs=epochs, validation_data=val_data, callbacks=[f1_metric])
     
     logging.info("Model Fitting is done")
@@ -64,10 +65,10 @@ def train_test(epochs, eval_batch_size, epsilon=1e-7, init_lr=2e-5, beta_1=0.9, 
     logging.info({"Loss": test_loss, "Accuracy": test_acc})
     
     # evaluate model with sklearn
-    predictions = model.predict(test_data[0], batch_size=eval_batch_size, verbose=1)
+    predictions = model.predict(test_inputs, batch_size=eval_batch_size, verbose=1)
     
-    sk_report = classification_report(test_data[1], predictions, digits=len(c.LABELS), labels=c.LABELS)
-    f1_score_sk = f1_score(test_data[1], predictions, labels=c.LABELS, average='micro')
+    sk_report = classification_report(test_labels, predictions, digits=len(c.LABELS), labels=c.LABELS)
+    f1_score_sk = f1_score(test_inputs, predictions, labels=c.LABELS, average='micro')
     
     print('\n')
     print(sk_report)

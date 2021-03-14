@@ -4,7 +4,13 @@ from sklearn.metrics import f1_score, precision_score, recall_score
 
 
 class F1Metric(Callback):
+    
+    def __init__(self, val_data):
+        super().__init__()
+        self.validation_data = val_data
+        
     def on_train_begin(self, logs={}):
+        print(self.validation_data)
         self.val_f1s = []
         self.val_recalls = []
         self.val_precisions = []

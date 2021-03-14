@@ -5,9 +5,10 @@ from sklearn.metrics import f1_score, precision_score, recall_score
 
 class F1Metric(Callback):
     
-    def __init__(self, val_data):
+    def __init__(self, val_data, labels):
         super().__init__()
         self.validation_data = val_data
+        self.label_data = labels
         
     def on_train_begin(self, logs={}):
         print(self.validation_data)
@@ -16,8 +17,8 @@ class F1Metric(Callback):
         self.val_precisions = []
     
     def on_epoch_end(self, epoch, logs={}):
-        val_predict = (np.asarray(self.model.predict(self.validation_data[0]))).round()
-        val_targ = self.validation_data[1]
+        val_predict = (np.asarray(self.model.predict(self.validation_data, batch_size=32))).round()
+        val_targ = self.label_data
         _val_f1 = f1_score(val_targ, val_predict)
         _val_recall = recall_score(val_targ, val_predict)
         _val_precision = precision_score(val_targ, val_predict)
@@ -27,8 +28,8 @@ class F1Metric(Callback):
         print(" — val_f1: % f — val_precision: % f — val_recall % f" % (_val_f1, _val_precision, _val_recall))
 
     def on_batch_end(self, batch, logs=None):
-        val_predict = (np.asarray(self.model.predict(self.validation_data[0]))).round()
-        val_targ = self.validation_data[1]
+        val_predict = (np.asarray(self.model.predict(self.validation_data, batch_size=32))).round()
+        val_targ = self.label_data
         _val_f1 = f1_score(val_targ, val_predict)
         _val_recall = recall_score(val_targ, val_predict)
         _val_precision = precision_score(val_targ, val_predict)

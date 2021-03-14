@@ -48,7 +48,7 @@ def train_test(epochs, eval_batch_size, epsilon=1e-7, init_lr=2e-5, beta_1=0.9, 
     
     logging.info("Test Validation features are ready")
     
-    f1_metric = F1Metric((val_inputs, val_labels))
+    f1_metric = F1Metric(val_data, val_labels)
     
     model.fit(train_data, epochs=epochs, validation_data=val_data, callbacks=[f1_metric])
     
@@ -65,10 +65,10 @@ def train_test(epochs, eval_batch_size, epsilon=1e-7, init_lr=2e-5, beta_1=0.9, 
     logging.info({"Loss": test_loss, "Accuracy": test_acc})
     
     # evaluate model with sklearn
-    predictions = model.predict(test_inputs, batch_size=eval_batch_size, verbose=1)
+    predictions = model.predict(test_data, batch_size=eval_batch_size, verbose=1)
     
     sk_report = classification_report(test_labels, predictions, digits=len(c.LABELS), labels=c.LABELS)
-    f1_score_sk = f1_score(test_inputs, predictions, labels=c.LABELS, average='micro')
+    f1_score_sk = f1_score(test_labels, predictions, labels=c.LABELS, average='micro')
     
     print('\n')
     print(sk_report)

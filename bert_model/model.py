@@ -48,7 +48,7 @@ def train_test(epochs, eval_batch_size, epsilon=1e-7, init_lr=2e-5, beta_1=0.9, 
     
     logging.info("Test Validation features are ready")
     
-    f1_metric = F1Metric()
+    f1_metric = F1Metric(val_data)
     model.fit(train_data, epochs=epochs, validation_data=val_data, callbacks=[f1_metric])
     
     logging.info("Model Fitting is done")

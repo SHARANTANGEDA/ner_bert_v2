@@ -17,7 +17,9 @@ class F1Metric(Callback):
         self.val_precisions = []
     
     def on_epoch_end(self, epoch, logs={}):
-        preds = np.asarray(self.model.predict(self.validation_data, batch_size=32), dtype=np.float)
+        output = self.model.predict(self.validation_data, batch_size=32).to_tuple()
+        print(output[0])
+        preds = np.asarray(output[1], dtype=np.float)
         print(preds.shape)
         val_predict = preds.round()
         val_targ = self.label_data

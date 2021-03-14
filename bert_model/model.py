@@ -65,10 +65,11 @@ def train_test(epochs, eval_batch_size, epsilon=1e-7, init_lr=2e-5, beta_1=0.9, 
     logging.info({"Loss": test_loss, "Accuracy": test_acc})
     
     # evaluate model with sklearn
-    predictions = model.predict(test_data, batch_size=eval_batch_size, verbose=1)
-    
-    sk_report = classification_report(test_labels, predictions, digits=len(c.LABELS), labels=c.LABELS)
-    f1_score_sk = f1_score(test_labels, predictions, labels=c.LABELS, average='micro')
+    predictions = model.predict(test_data, batch_size=eval_batch_size, verbose=1).to_tuple()
+    print(predictions)
+    preds = np.asarray(predictions[1], dtype=np.float).round()
+    sk_report = classification_report(test_labels, preds, digits=len(c.LABELS), labels=c.LABELS)
+    f1_score_sk = f1_score(test_labels, preds, labels=c.LABELS, average='micro')
     
     print('\n')
     print(sk_report)

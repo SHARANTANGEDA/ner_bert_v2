@@ -1,6 +1,9 @@
 import numpy as np
 from tensorflow.keras.callbacks import Callback
 from sklearn.metrics import f1_score, precision_score, recall_score
+from tensorflow.python.framework import ops
+from tensorflow.python.keras import backend as K
+from tensorflow.python.ops import math_ops
 
 
 # class F1Metric(Callback):
@@ -45,6 +48,8 @@ from sklearn.metrics import f1_score, precision_score, recall_score
 #     #     self.val_recalls.append(_val_recall)
 #     #     self.val_precisions.append(_val_precision)
 #     #     print(" — val_f1: % f — val_precision: % f — val_recall % f" % (_val_f1, _val_precision, _val_recall))
+from tensorflow.python.ops import array_ops
+
 
 def recall_m(y_true, y_pred):
     y_round = np.argmax(y_pred.numpy(), axis=1)
@@ -61,3 +66,22 @@ def f1_m(y_true, y_pred):
     y_round = np.argmax(y_pred.numpy(), axis=1)
     print(y_round)
     return f1_score(y_true.numpy(), y_round)
+
+
+def f1_m_1(y_true, y_pred):
+    y_pred = ops.convert_to_tensor_v2_with_dispatch(y_pred)
+    y_true = ops.convert_to_tensor_v2_with_dispatch(y_true)
+    y_pred_rank = y_pred.shape.ndims
+    y_true_rank = y_true.shape.ndims
+    # If the shape of y_true is (num_samples, 1), squeeze to (num_samples,)
+    if (y_true_rank is not None) and (y_pred_rank is not None) and (len(
+            K.int_shape(y_true)) == len(K.int_shape(y_pred))):
+        y_true = array_ops.squeeze(y_true, [-1])
+    y_pred = math_ops.argmax(y_pred, axis=-1)
+    
+    # If the predicted output and actual output types don't match, force cast them
+    # to match.
+    if K.dtype(y_pred) != K.dtype(y_true):
+        y_pred = math_ops.cast(y_pred, K.dtype(y_true))
+    
+    return f1_score(y_true.numpy(), y_pred.numpy())

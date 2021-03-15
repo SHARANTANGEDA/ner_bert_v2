@@ -37,7 +37,7 @@ def train_test(epochs, eval_batch_size, epsilon=1e-7, init_lr=2e-5, beta_1=0.9, 
     
     logging.info("Compiling Model ...")
     
-    model.compile(optimizer=optimizer, loss=loss, metrics=metrics)
+    model.compile(optimizer=optimizer, loss=loss, metrics=metrics, run_eagerly=True)
     
     logging.info("Model has been compiled")
     

@@ -11,7 +11,7 @@ from tensorflow import keras
 import tensorflow as tf
 import numpy as np
 
-from metrics.metrics import f1_m, recall_m, precision_m, f1_m_1
+from metrics.metrics import macro_f1, micro_f1, macro_recall, macro_precision, get_classification_report
 from ner_utils import extract_features
 import constants as c
 
@@ -32,7 +32,7 @@ def train_test(epochs, eval_batch_size, epsilon=1e-7, init_lr=2e-5, beta_1=0.9, 
     model.layers[-1].activation = tf.keras.activations.softmax
     optimizer = tf.keras.optimizers.Adam(learning_rate=init_lr, epsilon=epsilon, beta_1=beta_1, beta_2=beta_2)
     
-    metrics = [keras.metrics.SparseCategoricalAccuracy('accuracy', dtype=tf.float32), f1_m_1]
+    metrics = [keras.metrics.SparseCategoricalAccuracy('micro_f1/cat_accuracy', dtype=tf.float32), macro_f1]
     loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
     
     logging.info("Compiling Model ...")
@@ -58,25 +58,28 @@ def train_test(epochs, eval_batch_size, epsilon=1e-7, init_lr=2e-5, beta_1=0.9, 
     save_dir_path = os.path.join(c.FINAL_OUTPUT_DIR, str(datetime.utcnow()))
     os.mkdir(save_dir_path)
     tf.saved_model.save(model, export_dir=save_dir_path)
-    logging.info("Model Saved")
+    logging.info("Model Saved at: ", save_dir_path)
     
     # Test Scores
     test_loss, test_acc = model.evaluate(test_data, batch_size=eval_batch_size)
     logging.info({"Loss": test_loss, "Accuracy": test_acc})
     
     # evaluate model with sklearn
-    predictions = model.predict(test_data, batch_size=eval_batch_size, verbose=1).to_tuple()
+    predictions = model.predict(test_data, batch_size=eval_batch_size, verbose=1)
     print(predictions)
-    preds = np.asarray(predictions[1], dtype=np.float).round()
-    sk_report = classification_report(test_labels, preds, digits=len(c.LABELS), labels=c.LABELS)
-    f1_score_sk = f1_score(test_labels, preds, labels=c.LABELS, average='micro')
+    sk_report = get_classification_report(test_labels, predictions)
+    f1_score_sk = macro_f1(test_labels, predictions)
+    micro_f1_score = micro_f1(test_labels, predictions)
+    macro_precision_score = macro_precision(test_labels, predictions)
+    macro_recall_score = macro_recall(test_labels, predictions)
     
     print('\n')
     print(sk_report)
     logging.info(sk_report)
     
     logging.info("****TEST METRICS****")
-    metrics_dict = {"Loss": test_loss, "Accuracy": test_acc, "Micro_F_Score": f1_score_sk}
+    metrics_dict = {"Loss": test_loss, "CatAcc": test_acc, "Macro_F1": f1_score_sk, "Micro_F1": micro_f1_score,
+                    "Macro_Precision": macro_precision_score, "Macro_Recall": macro_recall_score}
     logging.info(str(metrics_dict))
     mlflow.log_metrics(metrics_dict)
     

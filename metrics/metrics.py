@@ -1,9 +1,10 @@
-import numpy as np
-from tensorflow.keras.callbacks import Callback
-from sklearn.metrics import f1_score, precision_score, recall_score
+from tensorflow.python.ops import array_ops
+from sklearn.metrics import f1_score, precision_score, recall_score, classification_report
 from tensorflow.python.framework import ops
 from tensorflow.python.keras import backend as K
 from tensorflow.python.ops import math_ops
+
+import constants as c
 
 
 # class F1Metric(Callback):
@@ -48,27 +49,8 @@ from tensorflow.python.ops import math_ops
 #     #     self.val_recalls.append(_val_recall)
 #     #     self.val_precisions.append(_val_precision)
 #     #     print(" — val_f1: % f — val_precision: % f — val_recall % f" % (_val_f1, _val_precision, _val_recall))
-from tensorflow.python.ops import array_ops
 
-
-def recall_m(y_true, y_pred):
-    y_round = np.argmax(y_pred.numpy(), axis=1)
-    print(y_round)
-    return recall_score(y_true.numpy(), y_round)
-
-
-def precision_m(y_true, y_pred):
-    y_round = np.argmax(y_pred.numpy(), axis=1)
-    return precision_score(y_true.numpy(), y_round)
-
-
-def f1_m(y_true, y_pred):
-    y_round = np.argmax(y_pred.numpy(), axis=1)
-    print(y_round)
-    return f1_score(y_true.numpy(), y_round)
-
-
-def f1_m_1(y_true, y_pred):
+def _prep_predictions(y_true, y_pred):
     y_pred = ops.convert_to_tensor_v2_with_dispatch(y_pred)
     y_true = ops.convert_to_tensor_v2_with_dispatch(y_true)
     y_pred_rank = y_pred.shape.ndims
@@ -83,5 +65,30 @@ def f1_m_1(y_true, y_pred):
     # to match.
     if K.dtype(y_pred) != K.dtype(y_true):
         y_pred = math_ops.cast(y_pred, K.dtype(y_true))
-    
-    return f1_score(y_true.numpy(), y_pred.numpy(), average='micro')
+    return y_true, y_pred
+
+
+def macro_recall(y_true, y_pred):
+    y_true_filter, y_pred_filter = _prep_predictions(y_true, y_pred)
+    return recall_score(y_true_filter.numpy(), y_pred_filter.numpy(), average='macro')
+
+
+def macro_precision(y_true, y_pred):
+    y_true_filter, y_pred_filter = _prep_predictions(y_true, y_pred)
+    return precision_score(y_true_filter.numpy(), y_pred_filter.numpy(), average='macro')
+
+
+def micro_f1(y_true, y_pred):
+    y_true_filter, y_pred_filter = _prep_predictions(y_true, y_pred)
+
+    return f1_score(y_true_filter.numpy(), y_pred_filter.numpy(), average='micro')
+
+
+def macro_f1(y_true, y_pred):
+    y_true_filter, y_pred_filter = _prep_predictions(y_true, y_pred)
+    return f1_score(y_true_filter.numpy(), y_pred_filter.numpy(), average='macro')
+
+
+def get_classification_report(y_true, y_pred):
+    y_true_filter, y_pred_filter = _prep_predictions(y_true, y_pred)
+    return classification_report(y_true_filter.numpy(), y_pred_filter.numpy(), digits=len(c.LABELS), labels=c.LABELS)

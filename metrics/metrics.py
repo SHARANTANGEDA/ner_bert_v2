@@ -47,17 +47,17 @@ from sklearn.metrics import f1_score, precision_score, recall_score
 #     #     print(" — val_f1: % f — val_precision: % f — val_recall % f" % (_val_f1, _val_precision, _val_recall))
 
 def recall_m(y_true, y_pred):
-    y_round = y_pred.numpy().round()
+    y_round = np.argmax(y_pred.numpy(), axis=1)
     print(y_round)
     return recall_score(y_true.numpy(), y_round)
 
 
 def precision_m(y_true, y_pred):
-    y_round = y_pred.numpy().round()
+    y_round = np.argmax(y_pred.numpy(), axis=1)
     return precision_score(y_true.numpy(), y_round)
 
 
 def f1_m(y_true, y_pred):
-    y_round = y_pred.numpy().round()
+    y_round = np.argmax(y_pred.numpy(), axis=1)
     print(y_round)
-    return f1_score(y_true.numpy(),y_round)
+    return f1_score(y_true.numpy(), y_round)

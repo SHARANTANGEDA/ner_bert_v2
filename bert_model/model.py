@@ -11,7 +11,7 @@ from tensorflow import keras
 import tensorflow as tf
 import numpy as np
 
-from metrics.metrics import F1Metric
+from metrics.metrics import f1_m, recall_m, precision_m
 from ner_utils import extract_features
 import constants as c
 
@@ -32,7 +32,7 @@ def train_test(epochs, eval_batch_size, epsilon=1e-7, init_lr=2e-5, beta_1=0.9, 
     model.layers[-1].activation = tf.keras.activations.softmax
     optimizer = tf.keras.optimizers.Adam(learning_rate=init_lr, epsilon=epsilon, beta_1=beta_1, beta_2=beta_2)
     
-    metrics = [keras.metrics.SparseCategoricalAccuracy('accuracy', dtype=tf.float32)]
+    metrics = [keras.metrics.SparseCategoricalAccuracy('accuracy', dtype=tf.float32), f1_m, recall_m, precision_m]
     loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
     
     logging.info("Compiling Model ...")
@@ -48,9 +48,9 @@ def train_test(epochs, eval_batch_size, epsilon=1e-7, init_lr=2e-5, beta_1=0.9, 
     
     logging.info("Test Validation features are ready")
     
-    f1_metric = F1Metric(val_data, val_labels)
+    # f1_metric = F1Metric(val_data, val_labels)
     
-    model.fit(train_data, epochs=epochs, validation_data=val_data, callbacks=[f1_metric])
+    model.fit(train_data, epochs=epochs, validation_data=val_data)
     
     logging.info("Model Fitting is done")
     

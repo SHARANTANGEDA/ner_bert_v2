@@ -84,4 +84,4 @@ def f1_m_1(y_true, y_pred):
     if K.dtype(y_pred) != K.dtype(y_true):
         y_pred = math_ops.cast(y_pred, K.dtype(y_true))
     
-    return f1_score(y_true.numpy(), y_pred.numpy())
+    return f1_score(y_true.numpy(), y_pred.numpy(), average='micro')

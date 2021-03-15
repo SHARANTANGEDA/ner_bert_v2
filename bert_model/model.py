@@ -58,11 +58,11 @@ def train_test(epochs, eval_batch_size, epsilon=1e-7, init_lr=2e-5, beta_1=0.9, 
     save_dir_path = os.path.join(c.FINAL_OUTPUT_DIR, str(datetime.utcnow()))
     os.mkdir(save_dir_path)
     tf.saved_model.save(model, export_dir=save_dir_path)
-    logging.info("Model Saved at: ", save_dir_path)
+    logging.info("Model Saved at: {}".format(save_dir_path))
     
     # Test Scores
     test_loss, test_acc = model.evaluate(test_data, batch_size=eval_batch_size)
-    logging.info({"Loss": test_loss, "Accuracy": test_acc})
+    logging.info(str({"Loss": test_loss, "Accuracy": test_acc}))
     
     # evaluate model with sklearn
     predictions = model.predict(test_data, batch_size=eval_batch_size, verbose=1)

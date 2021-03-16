@@ -1,3 +1,4 @@
+import argparse
 import logging
 import os
 from datetime import datetime
@@ -12,6 +13,11 @@ logging.basicConfig(filename=os.path.join(c.LOGS_DIR, f'{datetime.now()}.txt'),
                     level=logging.DEBUG)
 logging.getLogger().setLevel(logging.INFO)
 
-signature = load_saved_model_test(epochs=3, eval_batch_size=32, beta_1=0.9, beta_2=0.999, init_lr=2e-5, epsilon=1e-7)
+parser = argparse.ArgumentParser(description='Evaluate saved model')
+parser.add_argument('--model_path', type=str, dest="model_path", help="Add Absolute Path for saved model",
+                    required=True)
+
+args = parser.parse_args()
+signature = load_saved_model_test(eval_batch_size=32, model_path=args.model_path)
 print(signature)
 

@@ -95,29 +95,22 @@ def load_saved_model_test(epochs, eval_batch_size, epsilon=1e-7, init_lr=2e-5, b
     test_data, test_inputs, test_labels = extract_features.retrieve_features(c.TEST_FILE, c.LABELS, c.MAX_SEQ_LENGTH,
                                                                              tokenizer, c.LABEL_ID_PKL_FILE)
     saved_model = tf.saved_model.load(os.path.join(c.FINAL_OUTPUT_DIR, "96_64"))
-    print(saved_model["serving_default"])
-    model = saved_model["serving_default"]
-    # Test Scores
-    test_loss, test_acc, test_f1_macro = model.evaluate(test_data, batch_size=eval_batch_size)
-    logging.info(str({"Loss": test_loss, "Micro F1/Accuracy": test_acc, "Macro F1": test_f1_macro}))
-    
-    # evaluate model with sklearn
-    predictions = model.predict(test_data, batch_size=eval_batch_size, verbose=1)
-    print(predictions)
-    sk_report = get_classification_report(test_labels, predictions)
-    f1_score_sk = macro_f1(test_labels, predictions)
-    micro_f1_score = micro_f1(test_labels, predictions)
-    macro_precision_score = macro_precision(test_labels, predictions)
-    macro_recall_score = macro_recall(test_labels, predictions)
+    output = saved_model(test_data, batch_size=eval_batch_size)
+    print(output)
+    sk_report = get_classification_report(test_labels, output)
+    f1_score_sk = macro_f1(test_labels, output)
+    micro_f1_score = micro_f1(test_labels, output)
+    macro_precision_score = macro_precision(test_labels, output)
+    macro_recall_score = macro_recall(test_labels, output)
     
     print('\n')
     print(sk_report)
     logging.info(sk_report)
     
     logging.info("****TEST METRICS****")
-    metrics_dict = {"Loss": test_loss, "CatAcc": test_acc, "Macro_F1": f1_score_sk, "Micro_F1": micro_f1_score,
+    metrics_dict = {"Macro_F1": f1_score_sk, "Micro_F1": micro_f1_score,
                     "Macro_Precision": macro_precision_score, "Macro_Recall": macro_recall_score}
     logging.info(str(metrics_dict))
     return [
         f'epochs:{epochs}', f'eval_batch_size: {eval_batch_size}', f'epsilon: {epsilon}', f'init_lr: {init_lr}',
-        f'beta_1: {beta_1}', f'beta_2: {beta_2}'], f'bert_{test_acc}_{f1_score_sk}_{uuid.uuid4()}'
+        f'beta_1: {beta_1}', f'beta_2: {beta_2}'], f'bert_{f1_score_sk}_{uuid.uuid4()}'

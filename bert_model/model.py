@@ -94,8 +94,9 @@ def load_saved_model_test(epochs, eval_batch_size, epsilon=1e-7, init_lr=2e-5, b
     
     test_data, test_inputs, test_labels = extract_features.retrieve_features(c.TEST_FILE, c.LABELS, c.MAX_SEQ_LENGTH,
                                                                              tokenizer, c.LABEL_ID_PKL_FILE)
-    model = tf.saved_model.load(os.path.join(c.FINAL_OUTPUT_DIR, "96_64"))
-    print(model)
+    saved_model = tf.saved_model.load(os.path.join(c.FINAL_OUTPUT_DIR, "96_64"))
+    print(saved_model["serving_default"])
+    model = saved_model["serving_default"]
     # Test Scores
     test_loss, test_acc, test_f1_macro = model.evaluate(test_data, batch_size=eval_batch_size)
     logging.info(str({"Loss": test_loss, "Micro F1/Accuracy": test_acc, "Macro F1": test_f1_macro}))

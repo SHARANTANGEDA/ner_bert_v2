@@ -92,8 +92,9 @@ def load_saved_model_test(epochs, eval_batch_size, epsilon=1e-7, init_lr=2e-5, b
     """Create Features & Tokenize"""
     tokenizer = BertTokenizer.from_pretrained('bert-base-multilingual-cased', do_lower_case=True)
     
-    test_data, test_inputs, test_labels = extract_features.retrieve_features(c.TEST_FILE, c.LABELS, c.MAX_SEQ_LENGTH,
-                                                                             tokenizer, c.LABEL_ID_PKL_FILE)
+    test_data, test_inputs, test_labels = extract_features.retrieve_saved_model_features(c.TEST_FILE, c.LABELS,
+                                                                                         c.MAX_SEQ_LENGTH,
+                                                                                         tokenizer, c.LABEL_ID_PKL_FILE)
     saved_model = tf.saved_model.load(os.path.join(c.FINAL_OUTPUT_DIR, "96_64"))
     output = saved_model(test_inputs, batch_size=eval_batch_size)
     print(output)

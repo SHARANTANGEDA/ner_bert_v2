@@ -61,8 +61,8 @@ def train_test(epochs, eval_batch_size, epsilon=1e-7, init_lr=2e-5, beta_1=0.9, 
     logging.info("Model Saved at: {}".format(save_dir_path))
     
     # Test Scores
-    test_loss, test_acc = model.evaluate(test_data, batch_size=eval_batch_size)
-    logging.info(str({"Loss": test_loss, "Accuracy": test_acc}))
+    test_loss, test_acc, test_f1_macro = model.evaluate(test_data, batch_size=eval_batch_size)
+    logging.info(str({"Loss": test_loss, "Micro F1/Accuracy": test_acc, "Macro F1": test_f1_macro}))
     
     # evaluate model with sklearn
     predictions = model.predict(test_data, batch_size=eval_batch_size, verbose=1)
@@ -97,8 +97,8 @@ def load_saved_model_test(epochs, eval_batch_size, epsilon=1e-7, init_lr=2e-5, b
     model = tf.saved_model.load(os.path.join(c.FINAL_OUTPUT_DIR, "96_64"))
     print(model)
     # Test Scores
-    test_loss, test_acc = model.evaluate(test_data, batch_size=eval_batch_size)
-    logging.info(str({"Loss": test_loss, "Accuracy": test_acc}))
+    test_loss, test_acc, test_f1_macro = model.evaluate(test_data, batch_size=eval_batch_size)
+    logging.info(str({"Loss": test_loss, "Micro F1/Accuracy": test_acc, "Macro F1": test_f1_macro}))
     
     # evaluate model with sklearn
     predictions = model.predict(test_data, batch_size=eval_batch_size, verbose=1)

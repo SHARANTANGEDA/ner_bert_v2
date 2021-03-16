@@ -77,3 +77,33 @@ def retrieve_features(data_type, label_list, max_seq_length, tokenizer, label2id
             inputs.append(dict_from_input_data(row, attention_masks[idx], token_ids[idx]))
         
         return dataset, inputs, label_ids
+
+
+def retrieve_saved_model_features(data_type, label_list, max_seq_length, tokenizer, label2id_pkl_file):
+    label_map = {}
+    X, y = read_dataset(os.path.join(c.PROCESSED_DATASET_DIR, data_type))
+    
+    # here start with zero this means that "[PAD]" is zero
+    for (i, label) in enumerate(label_list):
+        label_map[label] = i
+    with open(label2id_pkl_file, 'wb') as w:
+        pickle.dump(label_map, w)
+    input_id_list, token_type_id_list, attention_mask_list, label_id_list = convert_to_input(X, y, tokenizer, label_map,
+                                                                                             max_seq_length)
+    input_ids = pad_sequences(input_id_list, maxlen=max_seq_length, dtype="long", truncating="post",
+                              padding="post")
+    token_ids = pad_sequences(token_type_id_list, maxlen=max_seq_length, dtype="long", truncating="post",
+                              padding="post")
+    attention_masks = pad_sequences(attention_mask_list, maxlen=max_seq_length, dtype="long", truncating="post",
+                                    padding="post")
+    label_ids = pad_sequences(label_id_list, maxlen=max_seq_length, dtype="long", truncating="post",
+                              padding="post")
+
+    dataset = tf.data.Dataset.from_tensor_slices((input_ids, attention_masks, token_ids,
+                                                  label_ids)).map(example_to_features)
+    inputs = []
+    for idx, row in enumerate(input_ids):
+        # inputs.append(dict_from_input_data(row, attention_masks[idx], token_ids[idx]))
+        inputs.append({"input_ids": row})
+    
+    return dataset, inputs, label_ids

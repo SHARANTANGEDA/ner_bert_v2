@@ -95,7 +95,7 @@ def load_saved_model_test(epochs, eval_batch_size, epsilon=1e-7, init_lr=2e-5, b
     test_data, test_inputs, test_labels = extract_features.retrieve_features(c.TEST_FILE, c.LABELS, c.MAX_SEQ_LENGTH,
                                                                              tokenizer, c.LABEL_ID_PKL_FILE)
     saved_model = tf.saved_model.load(os.path.join(c.FINAL_OUTPUT_DIR, "96_64"))
-    output = saved_model(test_data, batch_size=eval_batch_size)
+    output = saved_model(test_inputs, batch_size=eval_batch_size)
     print(output)
     sk_report = get_classification_report(test_labels, output)
     f1_score_sk = macro_f1(test_labels, output)

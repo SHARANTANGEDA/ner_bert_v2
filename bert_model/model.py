@@ -66,7 +66,7 @@ def train_test(epochs, eval_batch_size, epsilon=1e-7, init_lr=2e-5, beta_1=0.9, 
     logging.info(str({"Loss": test_loss, "Micro F1/Accuracy": test_acc, "Macro F1": test_f1_macro}))
     
     # evaluate model with sklearn
-    predictions = model.predict(test_data, batch_size=eval_batch_size, verbose=1)
+    predictions = model.predict(test_data, batch_size=eval_batch_size, verbose=1).logits
     print(predictions)
     sk_report = get_classification_report(test_labels, predictions)
     f1_score_sk = macro_f1(test_labels, predictions)

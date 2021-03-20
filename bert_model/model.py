@@ -1,18 +1,14 @@
 import logging
 import os
-import pickle
 import uuid
 from datetime import datetime
 
 import mlflow
-from sklearn.metrics import classification_report, f1_score
 from transformers import BertConfig, TFBertForTokenClassification, BertTokenizer
 from tensorflow import keras
 import tensorflow as tf
-import numpy as np
 
-from metrics.metrics import macro_f1, micro_f1, macro_recall, macro_precision, get_classification_report, \
-    calculate_pred_metrics
+from metrics.metrics import macro_f1, calculate_pred_metrics
 from ner_utils import extract_features
 import constants as c
 

@@ -92,3 +92,11 @@ def macro_f1(y_true, y_pred):
 def get_classification_report(y_true, y_pred):
     y_true_filter, y_pred_filter = _prep_predictions(y_true, y_pred)
     return classification_report(y_true_filter.numpy(), y_pred_filter.numpy(), digits=len(c.LABELS), labels=c.LABELS)
+
+
+def calculate_pred_metrics(y_true, y_pred):
+    y_true_filter, y_pred_filter = _prep_predictions(y_true, y_pred)
+    true_f, pred_f = y_true_filter.numpy(), y_pred_filter.numpy().reshape(len(y_true_filter), c.MAX_SEQ_LENGTH)
+    return classification_report(true_f, pred_f, digits=len(c.LABELS), labels=c.LABELS), f1_score(
+        true_f, pred_f, average='macro'), f1_score(true_f, pred_f, average='micro'), recall_score(
+        true_f, pred_f, average='macro'), precision_score(true_f, pred_f, average='macro')

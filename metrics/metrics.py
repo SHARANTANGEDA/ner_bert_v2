@@ -93,7 +93,7 @@ def get_classification_report(y_true, y_pred):
     y_true_filter, y_pred_filter = _prep_predictions(y_true, y_pred)
     report = classification_report(y_true_filter.numpy(), y_pred_filter.numpy(), labels=c.LABELS, output_dict=True)
     print(report)
-    return str(report)
+    return report
 
 
 def calculate_pred_metrics(y_true, y_pred):

@@ -87,21 +87,21 @@ def load_saved_model_test(eval_batch_size=32, model_path="96_64"):
     tokenizer = BertTokenizer.from_pretrained('bert-base-multilingual-cased', do_lower_case=True)
 
     trained_model = TFBertForTokenClassification.from_pretrained(model_path)
-
-    optimizer = tf.keras.optimizers.Adam()
-
-    metrics = [keras.metrics.SparseCategoricalAccuracy('micro_f1/cat_accuracy', dtype=tf.float32), macro_f1]
-    loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
-
-    logging.info("Compiling Model ...")
-
-    trained_model.compile(optimizer=optimizer, loss=loss, metrics=metrics, run_eagerly=True)
+    # 
+    # optimizer = tf.keras.optimizers.Adam()
+    #
+    # metrics = [keras.metrics.SparseCategoricalAccuracy('micro_f1/cat_accuracy', dtype=tf.float32), macro_f1]
+    # loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+    #
+    # logging.info("Compiling Model ...")
+    #
+    # trained_model.compile(optimizer=optimizer, loss=loss, metrics=metrics, run_eagerly=True)
     
     test_data, test_inputs, test_labels = extract_features.retrieve_features(c.TEST_FILE, c.LABELS, c.MAX_SEQ_LENGTH,
                                                                              tokenizer, c.LABEL_ID_PKL_FILE)
-    # Test Scores
-    test_loss, test_acc, test_f1_macro = trained_model.evaluate(test_data, batch_size=eval_batch_size)
-    logging.info(str({"Loss": test_loss, "Micro F1/Accuracy": test_acc, "Macro F1": test_f1_macro}))
+    # # Test Scores
+    # test_loss, test_acc, test_f1_macro = trained_model.evaluate(test_data, batch_size=eval_batch_size)
+    # logging.info(str({"Loss": test_loss, "Micro F1/Accuracy": test_acc, "Macro F1": test_f1_macro}))
 
     # evaluate model with sklearn
     predictions = trained_model.predict(test_data, batch_size=eval_batch_size, verbose=1).logits

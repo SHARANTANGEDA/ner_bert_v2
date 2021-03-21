@@ -104,7 +104,7 @@ def load_saved_model_test(eval_batch_size=32, model_path="96_64"):
     logging.info(str({"Loss": test_loss, "Micro F1/Accuracy": test_acc, "Macro F1": test_f1_macro}))
 
     # evaluate model with sklearn
-    predictions = trained_model.predict(test_data, batch_size=eval_batch_size, verbose=1).logits
+    predictions = np.argmax(trained_model.predict(test_data, batch_size=eval_batch_size, verbose=1).logits, axis=-1)
     print(predictions, test_labels)
     print(np.shape(predictions), np.shape(test_labels))
     sk_report, macro_f1_score, micro_f1_score, macro_recall_score, macro_precision_score = calculate_pred_metrics(

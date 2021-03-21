@@ -5,6 +5,8 @@ from tensorflow.python.framework import ops
 from tensorflow.python.keras import backend as K
 from tensorflow.python.ops import math_ops
 
+import numpy as np
+
 import constants as c
 
 
@@ -24,8 +26,9 @@ class EvalMetrics(Callback):
         self.val_precisions = []
     
     def on_epoch_end(self, epoch, logs={}):
-        predictions = self.model.predict(self.validation_data, batch_size=self.batch_size, verbose=1).logits
-        print(predictions)
+        predictions = np.argmax(self.model.predict(self.validation_data, batch_size=self.batch_size, verbose=1).logits,
+                                axis=-1)
+        print(np.shape(predictions))
         sk_report, macro_f1_score, micro_f1_score, macro_recall_score, macro_precision_score = calculate_pred_metrics(
             self.label_data, predictions)
         print(sk_report)

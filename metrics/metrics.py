@@ -82,7 +82,7 @@ def macro_f1(y_true, y_pred):
 def get_classification_report(y_true, y_pred):
     y_true_filter, y_pred_filter = _prep_predictions(y_true, y_pred)
     print(y_true_filter.numpy().shape, y_pred_filter.numpy().shape)
-    report = classification_report(y_true_filter.numpy(), y_pred_filter.numpy(), labels=c.LABELS, output_dict=True)
+    report = classification_report(y_true_filter.numpy(), y_pred_filter.numpy(), output_dict=True)
     print(report)
     return report
 

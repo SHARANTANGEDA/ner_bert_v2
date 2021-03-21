@@ -37,7 +37,7 @@ class EvalMetrics(Callback):
         self.val_recalls.append(macro_recall_score)
         self.val_precisions.append(macro_precision_score)
         self.val_f1s_micro.append(micro_f1_score)
-        print(f'Micro F1: {micro_f1_score}, Macro F1: {macro_f1_score}, Recall: {macro_recall_score},'
+        print(f'-Micro F1: {micro_f1_score}, Macro F1: {macro_f1_score}, Recall: {macro_recall_score},'
               f' Precision: {macro_precision_score}')
 
 

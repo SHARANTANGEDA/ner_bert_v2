@@ -91,8 +91,9 @@ def macro_f1(y_true, y_pred):
 
 def get_classification_report(y_true, y_pred):
     y_true_filter, y_pred_filter = _prep_predictions(y_true, y_pred)
-    return str(classification_report(y_true_filter.numpy(), y_pred_filter.numpy(), digits=len(c.LABELS),
-                                     labels=c.LABELS, output_dict=True))
+    report = classification_report(y_true_filter.numpy(), y_pred_filter.numpy(), labels=c.LABELS, output_dict=True)
+    print(report)
+    return str(report)
 
 
 def calculate_pred_metrics(y_true, y_pred):

@@ -87,6 +87,15 @@ def load_saved_model_test(eval_batch_size=32, model_path="96_64"):
     tokenizer = BertTokenizer.from_pretrained('bert-base-multilingual-cased', do_lower_case=True)
 
     trained_model = TFBertForTokenClassification.from_pretrained(model_path)
+
+    optimizer = tf.keras.optimizers.Adam()
+
+    metrics = [keras.metrics.SparseCategoricalAccuracy('micro_f1/cat_accuracy', dtype=tf.float32), macro_f1]
+    loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+
+    logging.info("Compiling Model ...")
+
+    trained_model.compile(optimizer=optimizer, loss=loss, metrics=metrics, run_eagerly=True)
     
     test_data, test_inputs, test_labels = extract_features.retrieve_features(c.TEST_FILE, c.LABELS, c.MAX_SEQ_LENGTH,
                                                                              tokenizer, c.LABEL_ID_PKL_FILE)

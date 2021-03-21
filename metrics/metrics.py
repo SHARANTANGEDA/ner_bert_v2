@@ -88,8 +88,8 @@ def get_classification_report(y_true, y_pred):
 
 
 def calculate_pred_metrics(y_true, y_pred):
-    y_true_filter, y_pred_filter = _prep_predictions(y_true, y_pred)
-    true_f, pred_f = y_true_filter.numpy(), y_pred_filter.numpy().reshape(len(y_true_filter), c.MAX_SEQ_LENGTH)
+    true_f, pred_f = _prep_predictions(y_true, y_pred)
+    # true_f, pred_f = true_f.numpy(), pred_f.numpy().reshape(len(true_f), c.MAX_SEQ_LENGTH)
     return classification_report(true_f, pred_f, labels=c.LABELS), f1_score(true_f, pred_f, average='macro'), f1_score(
         true_f, pred_f, average='micro'), recall_score(true_f, pred_f, average='macro'), precision_score(true_f, pred_f,
                                                                                                          average='macro')

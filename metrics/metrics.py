@@ -81,7 +81,7 @@ def macro_f1(y_true, y_pred):
 
 def get_classification_report(y_true, y_pred):
     y_true_filter, y_pred_filter = _prep_predictions(y_true, y_pred)
-    print(y_true_filter.numpy(), y_pred_filter.numpy())
+    print(y_true_filter.numpy().shape, y_pred_filter.numpy().shape)
     report = classification_report(y_true_filter.numpy(), y_pred_filter.numpy(), labels=c.LABELS, output_dict=True)
     print(report)
     return report
@@ -90,8 +90,8 @@ def get_classification_report(y_true, y_pred):
 def calculate_pred_metrics(y_true, y_pred):
     # true_f, pred_f = _prep_predictions(y_true, y_pred)
     print(y_true.shape, y_pred.shape)
-    true_f, pred_f = np.reshape(y_true, (len(y_true)*c.MAX_SEQ_LENGTH,)), np.reshape(y_pred,
-                                                                                     (len(y_pred),))
-    return classification_report(true_f, pred_f, labels=c.LABELS), f1_score(true_f, pred_f, average='macro'), f1_score(
-        true_f, pred_f, average='micro'), recall_score(true_f, pred_f, average='macro'), precision_score(true_f, pred_f,
-                                                                                                         average='macro')
+    true_f, pred_f = np.reshape(y_true, (len(y_true)*c.MAX_SEQ_LENGTH,)), np.reshape(y_pred, (len(y_pred),))
+    print(true_f.shape, pred_f.shape)
+    return classification_report(y_true=true_f, y_pred=pred_f, labels=c.LABELS), f1_score(
+        true_f, pred_f, average='macro'), f1_score(true_f, pred_f, average='micro'), recall_score(
+        true_f, pred_f, average='macro'), precision_score(true_f, pred_f, average='macro')

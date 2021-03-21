@@ -92,6 +92,6 @@ def calculate_pred_metrics(y_true, y_pred):
     print(y_true.shape, y_pred.shape)
     true_f, pred_f = np.reshape(y_true, (len(y_true)*c.MAX_SEQ_LENGTH,)), np.reshape(y_pred, (len(y_pred),))
     print(true_f.shape, pred_f.shape)
-    return classification_report(y_true=true_f, y_pred=pred_f, labels=c.LABELS), f1_score(
+    return classification_report(y_true=true_f, y_pred=pred_f), f1_score(
         true_f, pred_f, average='macro'), f1_score(true_f, pred_f, average='micro'), recall_score(
         true_f, pred_f, average='macro'), precision_score(true_f, pred_f, average='macro')

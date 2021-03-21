@@ -86,7 +86,7 @@ def load_saved_model_test(eval_batch_size=32, model_path="96_64"):
     """Create Features & Tokenize"""
     tokenizer = BertTokenizer.from_pretrained('bert-base-multilingual-cased', do_lower_case=True)
 
-    trained_model = TFBertForTokenClassification.from_pretrained(model_path, do_lower_case=True)
+    trained_model = TFBertForTokenClassification.from_pretrained(model_path)
     
     test_data, test_inputs, test_labels = extract_features.retrieve_features(c.TEST_FILE, c.LABELS, c.MAX_SEQ_LENGTH,
                                                                              tokenizer, c.LABEL_ID_PKL_FILE)

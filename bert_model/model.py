@@ -7,6 +7,7 @@ import mlflow
 from transformers import BertConfig, TFBertForTokenClassification, BertTokenizer
 from tensorflow import keras
 import tensorflow as tf
+import numpy as np
 
 from metrics.metrics import macro_f1, calculate_pred_metrics, EvalMetrics
 from ner_utils import extract_features
@@ -95,7 +96,8 @@ def load_saved_model_test(eval_batch_size=32, model_path="96_64"):
 
     # evaluate model with sklearn
     predictions = trained_model.predict(test_data, batch_size=eval_batch_size, verbose=1).logits
-    print(predictions)
+    print(predictions, test_labels)
+    print(np.shape(predictions), np.shape(test_labels))
     sk_report, macro_f1_score, micro_f1_score, macro_recall_score, macro_precision_score = calculate_pred_metrics(
         test_labels, predictions)
 

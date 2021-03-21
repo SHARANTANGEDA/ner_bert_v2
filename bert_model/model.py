@@ -8,7 +8,7 @@ from transformers import BertConfig, TFBertForTokenClassification, BertTokenizer
 from tensorflow import keras
 import tensorflow as tf
 
-from metrics.metrics import macro_f1, calculate_pred_metrics, get_classification_report
+from metrics.metrics import macro_f1, calculate_pred_metrics, f1_score_each_class
 from ner_utils import extract_features
 import constants as c
 
@@ -30,7 +30,7 @@ def train_test(epochs, eval_batch_size, epsilon=1e-7, init_lr=2e-5, beta_1=0.9, 
     optimizer = tf.keras.optimizers.Adam(learning_rate=init_lr, epsilon=epsilon, beta_1=beta_1, beta_2=beta_2)
     
     metrics = [keras.metrics.SparseCategoricalAccuracy('micro_f1/cat_accuracy', dtype=tf.float32), macro_f1,
-               get_classification_report]
+               f1_score_each_class]
     loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
     
     logging.info("Compiling Model ...")

@@ -114,7 +114,7 @@ def load_saved_model_test(eval_batch_size=32, model_path="96_64"):
     logging.info(sk_report)
 
     logging.info("****TEST METRICS****")
-    metrics_dict = {"Loss": test_loss, "CatAcc": test_acc, "Macro_F1": macro_f1_score, "Micro_F1": micro_f1_score,
+    metrics_dict = {"Macro_F1": macro_f1_score, "Micro_F1": micro_f1_score,
                     "Macro_Precision": macro_precision_score, "Macro_Recall": macro_recall_score}
     logging.info(str(metrics_dict))
-    return f'bert_{test_acc}_{macro_f1_score}_{uuid.uuid4()}'
+    return f'bert_eval_{macro_f1_score}_{uuid.uuid4()}'

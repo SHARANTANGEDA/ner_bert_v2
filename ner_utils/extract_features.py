@@ -8,6 +8,8 @@ import tensorflow as tf
 from ner_utils.pre_process import read_dataset, example_to_features, dict_from_input_data
 import constants as c
 
+import numpy as np
+
 
 def convert_to_input(sentences, tags, tokenizer, label_map, max_seq_length):
     input_id_list, attention_mask_list, token_type_id_list = [], [], []
@@ -76,7 +78,7 @@ def retrieve_features(data_type, label_list, max_seq_length, tokenizer, label2id
         for idx, row in enumerate(input_ids):
             inputs.append(dict_from_input_data(row, attention_masks[idx], token_ids[idx]))
         
-        return dataset, inputs, label_ids
+        return dataset, inputs, np.reshape(label_ids, (len(label_ids)*c.MAX_SEQ_LENGTH, 1))
 
 
 def retrieve_saved_model_features(data_type, label_list, max_seq_length, tokenizer, label2id_pkl_file):

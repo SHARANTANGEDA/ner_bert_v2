@@ -91,7 +91,9 @@ def macro_f1(y_true, y_pred):
 
 def f1_score_each_class(y_true, y_pred):
     y_true_filter, y_pred_filter = _prep_predictions(y_true, y_pred)
-    return f1_score(y_true_filter.numpy(), y_pred_filter.numpy(), average=None)
+    score = f1_score(y_true_filter.numpy(), y_pred_filter.numpy(), average=None)
+    print(score)
+    return score
 
 
 def get_classification_report(y_true, y_pred):

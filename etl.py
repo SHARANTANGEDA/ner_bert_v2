@@ -27,4 +27,4 @@ for idx, row in df.iterrows():
         couple = True
 
 df_formatted = pd.DataFrame(data, columns=['sequence', 'entity_type'])
-df_formatted.to_csv("telugu_dataset/nsp_train.csv", header=True, index=False)
+df_formatted.to_csv("telugu_dataset/train_merged.csv", header=False, index=False, mode='a')

@@ -28,3 +28,12 @@ for idx, row in df.iterrows():
 
 df_formatted = pd.DataFrame(data, columns=['sequence', 'entity_type'])
 df_formatted.to_csv("telugu_dataset/train_merged.csv", header=False, index=False, mode='a')
+
+#
+# text = open('NER_data.csv', 'r').readlines()
+# t_f = []
+# for line in text:
+#     if not line.startswith('","'):
+#         t_f.append(line)
+# file = open('NER_data.csv', 'w')
+# file.writelines(t_f)

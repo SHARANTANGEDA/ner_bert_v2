@@ -1,5 +1,5 @@
 import pandas as pd
-
+#
 # text = open('NER_data.csv', 'r').readlines()
 # t_f = []
 # for line in text:
@@ -16,7 +16,15 @@ couple = False
 
 for idx, row in df.iterrows():
     sentence.append(row['Word'])
-    label.append(row['Label'])
+    if row['Label'] == 'ORG':
+        label.append('B-ORG')
+    elif row['Label'] == 'MISC':
+        label.append('B-MISC')
+    elif row['Label'] == 'LOC':
+        label.append('B-LOC')
+    else:
+        label.append(row['Label'])
+        
     if row['Word'] == "." and couple:
         label = ' '.join([lbl for lbl in label if len(lbl) > 0])
         sentence = ' '.join([word for word in sentence if len(word) > 0])

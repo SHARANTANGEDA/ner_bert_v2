@@ -4,7 +4,7 @@ import pandas as pd
 # t_f = []
 # for line in text:
 #     if line.startswith(","):
-#         t_f.append(line[1:])
+#         t_f.append('"' + line[0] + '"' + line[1:])
 #     else:
 #         t_f.append(line)
 # file = open('NER_data.csv', 'w')

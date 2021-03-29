@@ -35,5 +35,3 @@ mlflow.tensorflow.autolog(every_n_iter=1, log_models=True, disable=False, exclus
 with mlflow.start_run(experiment_id=c.ML_FLOW_EXPERIMENT_ID):
     save_dir_path, tags, signature = train_test(epochs=args.epochs, eval_batch_size=args.batch_size, beta_1=args.beta_1,
                                                 beta_2=args.beta_2, init_lr=args.lr, epsilon=args.epsilon)
-    mlflow.tensorflow.save_model(tf_saved_model_dir=save_dir_path, tf_meta_graph_tags=tags,
-                                 tf_signature_def_key=signature, path=c.ML_FLOW_SAVE_DIR)

@@ -1,7 +1,7 @@
 import logging
 import os
+import time
 import uuid
-from datetime import datetime
 
 import mlflow
 from transformers import BertConfig, TFBertForTokenClassification, BertTokenizer
@@ -52,7 +52,7 @@ def train_test(epochs, eval_batch_size, epsilon=1e-7, init_lr=2e-5, beta_1=0.9, 
     logging.info("Model Fitting is done")
     
     # Save Model
-    save_dir_path = os.path.join(c.FINAL_OUTPUT_DIR, str(datetime.utcnow()))
+    save_dir_path = os.path.join(c.FINAL_OUTPUT_DIR, "model_"+str(time.time()))
     os.mkdir(save_dir_path)
     # tf.saved_model.save(model, export_dir=save_dir_path)
     model.save_pretrained(save_dir_path, saved_model=True)

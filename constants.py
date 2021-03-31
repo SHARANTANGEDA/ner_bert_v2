@@ -18,9 +18,9 @@ here "X" used to represent "##eer","##soo" and so on!
 """
 
 LABELS = ["[PAD]", "B-NAME", "B-LOC", "O", "B-ORG", "B-MISC", "[CLS]", "[SEP]", "X"]
-TRAIN_FILE = "train_merged.csv"
-VALIDATION_FILE = "validation.csv"
-TEST_FILE = "test.csv"
+TRAIN_FILE = "train_os.csv"
+VALIDATION_FILE = "validation_os.csv"
+TEST_FILE = "test_os.csv"
 TRAIN_TENSOR_RECORD = "train.tf_record"
 VAL_TENSOR_RECORD = "validation.tf_record"
 TEST_TENSOR_RECORD = "test.tf_record"

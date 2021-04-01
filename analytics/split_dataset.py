@@ -1,12 +1,11 @@
+from sklearn.model_selection import train_test_split
+
 lines = open('../telugu_dataset/total_over_sampled.csv').readlines()
 
 title = lines[0]
 lines = lines[1:]
 
-
-from sklearn.model_selection import train_test_split
 train, test = train_test_split(lines, test_size=0.1)
-
 train, val = train_test_split(train, test_size=0.1)
 
 

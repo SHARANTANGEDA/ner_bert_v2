@@ -33,5 +33,7 @@ logging.info("Lifecycle_stage: {}".format(experiment.lifecycle_stage))
 
 mlflow.tensorflow.autolog(every_n_iter=1, log_models=True, disable=False, exclusive=False)
 with mlflow.start_run(experiment_id=c.ML_FLOW_EXPERIMENT_ID):
-    save_dir_path, tags, signature = train_test(epochs=args.epochs, eval_batch_size=args.batch_size, beta_1=args.beta_1,
-                                                beta_2=args.beta_2, init_lr=args.lr, epsilon=args.epsilon)
+    save_dir_path, tags, signature = train_test(epochs=2, eval_batch_size=10, beta_1=0.9, beta_2=0.9,
+                                                init_lr=2e-6, epsilon=1e-5)
+    # save_dir_path, tags, signature = train_test(epochs=args.epochs, eval_batch_size=args.batch_size, beta_1=args.beta_1,
+    #                                             beta_2=args.beta_2, init_lr=args.lr, epsilon=args.epsilon)

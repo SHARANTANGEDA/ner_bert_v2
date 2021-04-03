@@ -16,7 +16,7 @@ def auto_label(rects):
 
 LABELS = ["B-NAME", "B-LOC", "O", "B-ORG", "B-MISC"]
 
-rows = pd.read_csv('../telugu_dataset/train_os.csv')
+rows = pd.read_csv('../telugu_dataset/total_over_sampled.csv')
 
 initial_labels = []
 

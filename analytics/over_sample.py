@@ -11,13 +11,13 @@ over_sample_tokens = []
 for idx, row in data.iterrows():
     labels = row['entity_type']
     lbl_list = labels.split(" ")
-    if lbl_list.count("O") < len(lbl_list) - lbl_list.count("O"):
+    if lbl_list.count("O") + 1 < len(lbl_list) - lbl_list.count("O"):
         over_sample_tokens.append(idx)
 
 print(len(over_sample_tokens))
 cnt = len(over_sample_tokens)
-sample_times = 25
-# 6602
+sample_times = 20
+# 2867
 rows_std = open('../telugu_dataset/total.csv', 'r').readlines()
 rows_std = rows_std[1:]
 

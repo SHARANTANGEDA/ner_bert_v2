@@ -100,16 +100,11 @@ def retrieve_pred_features(file_path, label_list, max_seq_length, tokenizer, lab
                                     padding="post")
     label_ids = pad_sequences(label_id_list, maxlen=max_seq_length, dtype="long", truncating="post",
                               padding="post")
+    dataset = tf.data.Dataset.from_tensor_slices((input_ids, attention_masks, token_ids,
+                                                  label_ids)).map(example_to_features)
+    inputs = []
+    for idx, row in enumerate(input_ids):
+        inputs.append(dict_from_input_data(row, attention_masks[idx], token_ids[idx]))
     
-    if data_type == c.TRAIN_FILE:
-        return tf.data.Dataset.from_tensor_slices((input_ids, attention_masks, token_ids,
-                                                   label_ids)).map(example_to_features)
-    else:
-        dataset = tf.data.Dataset.from_tensor_slices((input_ids, attention_masks, token_ids,
-                                                      label_ids)).map(example_to_features)
-        inputs = []
-        for idx, row in enumerate(input_ids):
-            inputs.append(dict_from_input_data(row, attention_masks[idx], token_ids[idx]))
-        
-        # return dataset, inputs, np.reshape(label_ids, (len(label_ids)*c.MAX_SEQ_LENGTH, 1))
-        return dataset, inputs, label_ids
+    # return dataset, inputs, np.reshape(label_ids, (len(label_ids)*c.MAX_SEQ_LENGTH, 1))
+    return dataset, inputs, label_ids

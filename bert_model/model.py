@@ -82,7 +82,8 @@ def train_test(epochs, eval_batch_size, epsilon=1e-7, init_lr=2e-5, beta_1=0.9, 
         f'beta_1: {beta_1}', f'beta_2: {beta_2}'], f'bert_{test_acc}_{macro_f1_score}_{uuid.uuid4()}'
 
 
-def load_saved_model_test(eval_batch_size=32, model_path="96_64"):
+def load_saved_model_test(eval_batch_size=32, model_path="96_64", file_path=os.path.join(c.PROCESSED_DATASET_DIR,
+                                                                                         c.TEST_FILE)):
     """Create Features & Tokenize"""
     tokenizer = BertTokenizer.from_pretrained('bert-base-multilingual-cased', do_lower_case=True)
 
@@ -97,8 +98,9 @@ def load_saved_model_test(eval_batch_size=32, model_path="96_64"):
 
     trained_model.compile(optimizer=optimizer, loss=loss, metrics=metrics, run_eagerly=True)
     
-    test_data, test_inputs, test_labels = extract_features.retrieve_features(c.TEST_FILE, c.LABELS, c.MAX_SEQ_LENGTH,
-                                                                             tokenizer, c.LABEL_ID_PKL_FILE)
+    test_data, test_inputs, test_labels = extract_features.retrieve_pred_features(file_path, c.LABELS,
+                                                                                  c.MAX_SEQ_LENGTH,  tokenizer,
+                                                                                  c.LABEL_ID_PKL_FILE)
     # # Test Scores
     # test_loss, test_acc, test_f1_macro = trained_model.evaluate(test_data, batch_size=eval_batch_size)
     # logging.info(str({"Loss": test_loss, "Micro F1/Accuracy": test_acc, "Macro F1": test_f1_macro}))

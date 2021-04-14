@@ -82,10 +82,9 @@ def retrieve_features(data_type, label_list, max_seq_length, tokenizer, label2id
         return dataset, inputs, label_ids
 
 
-def retrieve_saved_model_features(data_type, label_list, max_seq_length, tokenizer, label2id_pkl_file):
+def retrieve_pred_features(file_path, label_list, max_seq_length, tokenizer, label2id_pkl_file):
     label_map = {}
-    X, y = read_dataset(os.path.join(c.PROCESSED_DATASET_DIR, data_type))
-    
+    X, y = read_dataset(file_path)
     # here start with zero this means that "[PAD]" is zero
     for (i, label) in enumerate(label_list):
         label_map[label] = i
@@ -101,12 +100,16 @@ def retrieve_saved_model_features(data_type, label_list, max_seq_length, tokeniz
                                     padding="post")
     label_ids = pad_sequences(label_id_list, maxlen=max_seq_length, dtype="long", truncating="post",
                               padding="post")
-
-    dataset = tf.data.Dataset.from_tensor_slices((input_ids, attention_masks, token_ids,
-                                                  label_ids)).map(example_to_features)
-    inputs = []
-    for idx, row in enumerate(input_ids):
-        # inputs.append(dict_from_input_data(row, attention_masks[idx], token_ids[idx]))
-        inputs.append({"input_ids": row})
     
-    return dataset, inputs, label_ids
+    if data_type == c.TRAIN_FILE:
+        return tf.data.Dataset.from_tensor_slices((input_ids, attention_masks, token_ids,
+                                                   label_ids)).map(example_to_features)
+    else:
+        dataset = tf.data.Dataset.from_tensor_slices((input_ids, attention_masks, token_ids,
+                                                      label_ids)).map(example_to_features)
+        inputs = []
+        for idx, row in enumerate(input_ids):
+            inputs.append(dict_from_input_data(row, attention_masks[idx], token_ids[idx]))
+        
+        # return dataset, inputs, np.reshape(label_ids, (len(label_ids)*c.MAX_SEQ_LENGTH, 1))
+        return dataset, inputs, label_ids

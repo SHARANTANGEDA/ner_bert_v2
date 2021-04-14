@@ -16,8 +16,8 @@ logging.getLogger().setLevel(logging.INFO)
 parser = argparse.ArgumentParser(description='Evaluate saved model')
 parser.add_argument('--model_path', type=str, dest="model_path", help="Add Absolute Path for saved model",
                     required=True)
+parser.add_argument('--file_path', type=str, dest="file_path", help="Add Absolute Path for prediction file",
+                    required=True)
 
 args = parser.parse_args()
-signature = load_saved_model_test(eval_batch_size=32, model_path=args.model_path)
-print(signature)
-
+signature = load_saved_model_test(eval_batch_size=32, model_path=args.model_path, file_path=args.file_path)
